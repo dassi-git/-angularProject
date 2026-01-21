@@ -1,0 +1,93 @@
+:root{
+  --bg:#ffffff;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --border:#e6e7eb;
+  --accent:#06b6d4;
+  --danger:#dc2626;
+  --primary:#06b6d4;
+  --primary-600:#0891b2;
+  --surface:#ffffff;
+}
+
+.gift-list{
+  max-width:980px;
+  margin:20px auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:#111827;
+  direction: rtl;
+}
+
+.gift-list h2{ margin:0 0 12px 0; font-size:20px }
+
+.actions{ display:flex; gap:8px; justify-content:flex-start; margin-bottom:12px }
+
+button{ cursor:pointer; border:1px solid var(--border); background:transparent; padding:8px 12px; border-radius:6px }
+
+button:hover{ box-shadow:0 1px 3px rgba(0,0,0,0.06) }
+
+/* button variants */
+.btn{ border:1px solid var(--border); background:transparent; padding:8px 12px; border-radius:8px; font-weight:600 }
+.btn-primary{ background:var(--primary); color:white; border-color:var(--primary) }
+.btn-primary:hover{ background:var(--primary-600); border-color:var(--primary-600) }
+.btn-danger{ background:var(--danger); color:white; border-color:var(--danger) }
+.btn-danger:hover{ filter:brightness(0.95) }
+.btn-ghost{ background:transparent; color:var(--primary); border-color:transparent }
+.btn-ghost:hover{ background:rgba(6,182,212,0.06) }
+
+.gifts-table{ width:100%; border-collapse:collapse; box-shadow:0 1px 2px rgba(16,24,40,0.03); border-radius:8px; overflow:hidden }
+.gifts-table thead{ background:linear-gradient(180deg, #f1fbfb, #ffffff) }
+.gifts-table th, .gifts-table td{ padding:12px 14px; border-bottom:1px solid var(--border); text-align:right; vertical-align:middle }
+.gifts-table th{ font-weight:700; color:var(--muted); font-size:13px; text-transform:uppercase }
+.gifts-table tbody tr:hover{ background:#fbfdff }
+
+/* Column sizing and alignment for neat table */
+.gifts-table th.col-number, .gifts-table td.col-number{ width:90px; text-align:center }
+.gifts-table th.col-name, .gifts-table td.col-name{ width:auto; text-align:right }
+.gifts-table th.col-donor, .gifts-table td.col-donor{ width:160px; text-align:center }
+.gifts-table th.col-ticket, .gifts-table td.col-ticket{ width:120px; text-align:center }
+.gifts-table th.col-actions, .gifts-table td.col-actions{ width:160px; text-align:center }
+
+/* sticky header */
+.gifts-table thead th{ position:sticky; top:0; z-index:2 }
+
+/* compact action buttons */
+.gifts-table .btn{ padding:6px 8px; font-size:13px; border-radius:6px }
+.gifts-table .btn-ghost{ padding:6px 8px }
+
+/* tighter row spacing */
+.gifts-table td{ padding-top:10px; padding-bottom:10px }
+
+.gifts-table tbody tr:nth-child(odd){ background: #ffffff }
+.gifts-table tbody tr:nth-child(even){ background: #fbfbfd }
+.gifts-table td.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace }
+.donor{ display:inline-block; padding:6px 10px; background:rgba(6,182,212,0.06); border-radius:999px; color:var(--primary) }
+.badge{ display:inline-block; padding:6px 8px; background:linear-gradient(90deg, rgba(6,182,212,0.12), rgba(6,182,212,0.04)); border-radius:999px; color:var(--primary); font-weight:700 }
+
+.gift-form{ border:1px solid var(--border); padding:18px; background:var(--card); border-radius:12px; margin-top:12px }
+.gift-form .grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:12px }
+.field label{ display:block; color:var(--muted); margin-bottom:6px }
+.gift-form input, .gift-form select{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px }
+
+.form-actions{ display:flex; gap:8px; justify-content:flex-start; margin-top:12px }
+.error{ color:var(--danger); margin:8px 0 }
+
+.card{ background:var(--surface); border-radius:12px; box-shadow:0 8px 20px rgba(2,6,23,0.06); overflow:hidden }
+.card-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid rgba(16,24,40,0.03) }
+.card-header .title{ display:flex; gap:12px; align-items:center }
+.card-header h2{ margin:0; font-size:18px }
+.card-header .subtitle{ color:var(--muted); font-size:13px }
+.card-body{ padding:18px }
+.empty{ color:var(--muted); padding:14px 0 }
+
+@media (max-width:720px){
+  .gift-form .grid{ grid-template-columns: 1fr }
+  .card-header{ flex-direction:column; align-items:stretch; gap:10px }
+  .header-actions{ display:flex; justify-content:flex-end }
+}
+
+@media (max-width:720px){
+  .gift-form .row{ flex-direction:column; align-items:stretch }
+  .gift-form label{ width:100%; margin-bottom:6px }
+  .gifts-table th, .gifts-table td{ padding:10px }
+}

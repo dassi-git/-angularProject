@@ -1,0 +1,78 @@
+<div class="gift-list">
+	<div class="card">
+		<header class="card-header">
+			<div class="title">
+				<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+					<rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.2" fill="rgba(6,182,212,0.08)" />
+					<path d="M7 9h10" stroke="currentColor" stroke-width="1.2"/>
+				</svg>
+				<div>
+					<h2>ניהול רשימת מתנות</h2>
+					<div class="subtitle">רשום/י מתנות, עריכה ומחיקה — עלות כרטיס ברירת מחדל 10₪</div>
+				</div>
+			</div>
+			<div class="header-actions">
+				<button class="btn btn-primary" (click)="startAdd()">הוסף מתנה</button>
+			</div>
+		</header>
+
+		<div class="card-body">
+			<div *ngIf="error()" class="error">{{ error() }}</div>
+
+			<table class="gifts-table" *ngIf="gifts().length">
+				<thead>
+					<tr>
+						<th class="col-number">מספר</th>
+						<th class="col-name">שם</th>
+						<th class="col-donor">מי הנותן</th>
+						<th class="col-ticket">עלות כרטיס</th>
+						<th class="col-actions">פעולות</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let g of gifts()">
+						<td class="col-number mono">{{ g.number }}</td>
+						<td class="col-name">{{ g.name }}</td>
+						<td class="col-donor"><span class="donor">{{ g.donor }}</span></td>
+						<td class="col-ticket"><span class="badge">{{ g.ticketCost }} ₪</span></td>
+						<td class="col-actions">
+							<button class="btn btn-ghost" (click)="startEdit(g)">✏️ ערוך</button>
+							<button class="btn btn-danger" (click)="delete(g)">🗑️ מחק</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div *ngIf="!gifts().length" class="empty">אין מתנות במערכת. לחצו "הוסף מתנה" כדי להתחיל.</div>
+
+			<form *ngIf="editing()" class="gift-form" (ngSubmit)="save()">
+				<div class="grid">
+					<div class="field">
+						<label>מספר מתנה</label>
+						<input name="number" type="number" [(ngModel)]="form().number" required placeholder="הזן מספר" />
+					</div>
+					<div class="field">
+						<label>שם המתנה</label>
+						<input name="name" type="text" [(ngModel)]="form().name" required placeholder="שם המתנה" />
+					</div>
+					<div class="field">
+						<label>התורם</label>
+						<select name="donor" [(ngModel)]="form().donor" required>
+							<option value="" disabled selected>בחר תורם</option>
+							<option *ngFor="let d of donors" [value]="d">{{ d }}</option>
+						</select>
+					</div>
+					<div class="field">
+						<label>עלות כרטיס (₪)</label>
+						<input name="ticketCost" type="number" [(ngModel)]="form().ticketCost" required />
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">שמור</button>
+					<button type="button" class="btn btn-ghost" (click)="cancel()">ביטול</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
