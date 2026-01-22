@@ -33,12 +33,10 @@ export class Cart implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // טעינה ראשונית בלבד
     this.loadCartItems();
   }
 
   ngOnDestroy(): void {
-    // ביטול מנוי למניעת דליפות זיכרון
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
@@ -137,8 +135,8 @@ export class Cart implements OnInit, OnDestroy {
       next: (response) => {
         console.log('רכישה אושרה:', response);
         this.orderService.clearCart();
-        this.cartItems = [];
-        this.totalAmount = 0;
+        this.loadCartItems(); // רענון הסל
+        this.loadOrders(); // רענון ההזמנות
         this.isLoading = false;
         alert('הרכישה אושרה בהצלחה!');
       },

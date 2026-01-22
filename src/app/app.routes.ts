@@ -5,6 +5,7 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { GiftListComponent } from './components/gift-list/gift-list.component';
 import { GiftManagementComponent } from './components/gift-management/gift-management.component';
+import { MyOrdersComponent } from './components/my-orders/my-orders.component';
 import { AuthGuard } from './services';
 
 /**
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'gifts', component: GiftListComponent, canActivate: [AuthGuard] }, // רשימת מתנות - דורש אימות
   { path: 'gift-management', component: GiftManagementComponent, canActivate: [AuthGuard] }, // ניהול מתנות - דורש אימות
   { path: 'cart', component: Cart, canActivate: [AuthGuard] }, // עגלת קניות - דורש אימות
+  { path: 'my-orders', component: MyOrdersComponent, canActivate: [AuthGuard] }, // ההזמנות שלי - דורש אימות
   { path: 'admin', component: AdminDashboard, canActivate: [AuthGuard] }, // לוח בקרה מנהל - דורש אימות
   { path: '', redirectTo: '/gifts', pathMatch: 'full' } // נתיב ברירת מחדל - הפניה לרשימת מתנות
 ];
