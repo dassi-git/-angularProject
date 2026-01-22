@@ -1,0 +1,112 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center">
+          <h4>הרשמה למערכת ההגרלות</h4>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="register()">
+            <div class="mb-3">
+              <label class="form-label">שם מלא:</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [class.is-invalid]="nameError"
+                [(ngModel)]="user.name"
+                (blur)="validateName()"
+                (input)="validateName()"
+                name="name"
+                required>
+              <div class="invalid-feedback" *ngIf="nameError">
+                {{ nameError }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">אימייל:</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                [class.is-invalid]="emailError"
+                [(ngModel)]="user.email"
+                (blur)="validateEmail()"
+                (input)="validateEmail()"
+                name="email"
+                required>
+              <div class="invalid-feedback" *ngIf="emailError">
+                {{ emailError }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">טלפון:</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                [class.is-invalid]="phoneError"
+                [(ngModel)]="user.phone"
+                (blur)="validatePhone()"
+                (input)="validatePhone()"
+                name="phone"
+                required>
+              <div class="invalid-feedback" *ngIf="phoneError">
+                {{ phoneError }}
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">סיסמה:</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                [class.is-invalid]="passwordError"
+                [(ngModel)]="user.password"
+                (blur)="validatePassword()"
+                (input)="validatePassword()"
+                name="password"
+                required>
+              <div class="invalid-feedback" *ngIf="passwordError">
+                {{ passwordError }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">אישור סיסמה:</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                [class.is-invalid]="confirmPasswordError"
+                [(ngModel)]="confirmPassword"
+                (blur)="validateConfirmPassword()"
+                (input)="validateConfirmPassword()"
+                name="confirmPassword"
+                required>
+              <div class="invalid-feedback" *ngIf="confirmPasswordError">
+                {{ confirmPasswordError }}
+              </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-success w-100"
+              [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              הירשם
+            </button>
+          </form>
+
+          <hr>
+          
+          <div class="text-center">
+            <p>כבר יש לך חשבון? <a routerLink="/login">התחבר כאן</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

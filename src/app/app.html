@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="#">{{ title() }}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/login">התחברות</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/register">הרשמה</a>
+        </li>
+        <li class="nav-item" *ngIf="(authService.currentUser$ | async)?.role === 'Admin' || (authService.currentUser$ | async)?.role === 'Manager'">
+          <a class="nav-link" routerLink="/admin">ניהול</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cart">סל קניות</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#gifts">מתנות</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#tickets">כרטיסים</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#winners">זוכים</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#donors">תורמים</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>
