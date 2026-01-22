@@ -1,0 +1,70 @@
+<div class="container">
+  <h2>ההזמנות שלי</h2>
+
+  <!-- הודעת טעינה -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>טוען הזמנות...</p>
+  </div>
+
+  <!-- הודעת שגיאה -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadOrders()">נסה שוב</button>
+  </div>
+
+  <!-- רשימת הזמנות -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <div *ngIf="orders.length === 0" class="alert alert-info">
+      עדיין לא ביצעת הזמנות
+    </div>
+
+    <div *ngIf="orders.length > 0" class="orders-list">
+      <div *ngFor="let order of orders" class="order-card card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">הזמנה #{{ order.id }}</h5>
+          <span class="badge" [class]="order.isDraft ? 'bg-warning' : 'bg-success'">
+            {{ getOrderStatus(order) }}
+          </span>
+        </div>
+        
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>תאריך:</strong> {{ getOrderDate(order) }}</p>
+              <p><strong>סכום כולל:</strong> ₪{{ order.totalAmount || 0 }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>מספר פריטים:</strong> {{ order.orderItems?.length || 0 }}</p>
+            </div>
+          </div>
+
+          <!-- פריטי ההזמנה -->
+          <div *ngIf="order.orderItems && order.orderItems.length > 0" class="order-items mt-3">
+            <h6>פריטים בהזמנה:</h6>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>מתנה</th>
+                    <th>כמות</th>
+                    <th>מחיר יחידה</th>
+                    <th>סה"כ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of order.orderItems">
+                    <td>מתנה #{{ item.giftId }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₪{{ item.unitPrice || 0 }}</td>
+                    <td>₪{{ (item.quantity * (item.unitPrice || 0)) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

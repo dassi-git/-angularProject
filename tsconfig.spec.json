@@ -5,10 +5,19 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
+<<<<<<< HEAD
       "jasmine"
     ]
   },
   "include": [
     "src/**/*.ts"
+=======
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.spec.ts"
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
   ]
 }

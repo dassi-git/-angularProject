@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # Project
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+=======
+# RaffleSystem
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
 
 ## Development server
 
@@ -38,7 +44,11 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Running unit tests
 
+<<<<<<< HEAD
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+=======
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
 
 ```bash
 ng test

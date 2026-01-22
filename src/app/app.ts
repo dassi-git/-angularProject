@@ -1,14 +1,20 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+
+
 import { GiftList } from './gift-list/gift-list';
+
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './services';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, GiftList],
+  imports: [RouterOutlet, RouterLink, CommonModule,GiftList],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']
+  styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('project');
+  protected readonly title = signal('מערכת ההגרלות');
+
+  constructor(public authService: AuthService) {}
 }
- 

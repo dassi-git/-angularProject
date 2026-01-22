@@ -1,0 +1,112 @@
+<!-- מיכל ראשי לרכיב רשימת המתנות -->
+<div class="gift-list-container">
+  <!-- כותרת וכלי בקרה -->
+  <div class="header">
+    <h2>רשימת מתנות</h2>
+    
+    <!-- בקרות מיון וסינון -->
+    <div class="controls">
+      <!-- בקרות מיון -->
+      <div class="sort-controls">
+        <label for="sortBy">מיון לפי:</label>
+        <!-- תפריט נפתח לבחירת שדה המיון -->
+        <select id="sortBy" [(ngModel)]="sortBy" (change)="onSortChange()">
+          <option value="name">שם</option>
+          <option value="price">מחיר</option>
+          <option value="category">קטגוריה</option>
+        </select>
+        
+        <!-- כפתור להחלפת כיוון המיון (עולה/יורד) -->
+        <button class="sort-order-btn" (click)="toggleSortOrder()" 
+                [title]="sortOrder === 'asc' ? 'מיון עולה' : 'מיון יורד'">
+          <span *ngIf="sortOrder === 'asc'">↑</span>
+          <span *ngIf="sortOrder === 'desc'">↓</span>
+        </button>
+      </div>
+      
+      <!-- בקרות סינון -->
+      <div class="filter-controls">
+        <label for="categoryFilter">סינון לפי קטגוריה:</label>
+        <!-- תפריט נפתח לבחירת קטגוריה לסינון -->
+        <select id="categoryFilter" [(ngModel)]="selectedCategory" (change)="onCategoryFilter()">
+          <option value="">כל הקטגוריות</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- הודעת טעינה - מוצגת בזמן שליפת הנתונים -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>טוען מתנות...</p>
+  </div>
+
+  <!-- הודעת שגיאה - מוצגת במקרה של כשל -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+    <button (click)="loadGifts()">נסה שוב</button>
+  </div>
+
+  <!-- רשת כרטיסי המתנות - מוצגת רק כשיש מתנות להציג -->
+  <div *ngIf="!isLoading && !errorMessage && filteredGifts.length > 0" class="gifts-grid">
+    <!-- לולאה על כל המתנות המסוננות -->
+    <div *ngFor="let gift of filteredGifts; trackBy: trackByGiftId" class="gift-card">
+      <!-- כותרת הכרטיס -->
+      <div class="gift-header">
+        <h3 class="gift-name">{{ gift.name }}</h3>
+        <span class="gift-category">{{ gift.category }}</span>
+      </div>
+      
+      <!-- גוף הכרטיס -->
+      <div class="gift-body">
+        <!-- תיאור המתנה (אם קיים) -->
+        <p class="gift-description" *ngIf="gift.description">
+          {{ gift.description }}
+        </p>
+        
+        <!-- פרטי המתנה -->
+        <div class="gift-details">
+          <!-- מחיר הכרטיס -->
+          <div class="price-info">
+            <span class="price-label">מחיר כרטיס:</span>
+            <span class="price-value">₪{{ gift.ticketPrice }}</span>
+          </div>
+          
+          <!-- שם התורם -->
+          <div class="donor-info">
+            <span class="donor-label">תורם:</span>
+            <span class="donor-name">{{ gift.donorName }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- תחתית הכרטיס -->
+      <div class="gift-footer">
+        <!-- כפתור הוספה לסל עם טיפול במצב טעינה -->
+        <button 
+          class="add-to-cart-btn" 
+          (click)="addToCart(gift)"
+          [disabled]="isAddingToCart(gift.id)"
+          [class.loading]="isAddingToCart(gift.id)"
+          [title]="authService.isAuthenticated() ? 'הוסף לסל' : 'נדרשת התחברות'">
+          
+          <!-- איקון טעינה -->
+          <span *ngIf="isAddingToCart(gift.id)" class="loading-spinner"></span>
+          
+          <!-- טקסט הכפתור -->
+          <span *ngIf="!isAddingToCart(gift.id) && authService.isAuthenticated()">הוסף לסל</span>
+          <span *ngIf="!isAddingToCart(gift.id) && !authService.isAuthenticated()">התחבר להוספה</span>
+          <span *ngIf="isAddingToCart(gift.id)">מוסיף...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- הודעה כשאין מתנות להציג -->
+  <div *ngIf="!isLoading && !errorMessage && filteredGifts.length === 0" class="no-gifts">
+    <p>לא נמצאו מתנות בקטגוריה זו</p>
+  </div>
+</div>

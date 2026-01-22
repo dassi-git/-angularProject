@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "project",
+=======
+  "name": "raffle-system",
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -9,6 +13,11 @@
     "test": "ng test"
   },
   "prettier": {
+<<<<<<< HEAD
+=======
+    "printWidth": 100,
+    "singleQuote": true,
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
     "overrides": [
       {
         "files": "*.html",
@@ -19,6 +28,7 @@
     ]
   },
   "private": true,
+<<<<<<< HEAD
   "dependencies": {
     "@angular/common": "^20.1.0",
     "@angular/compiler": "^20.1.0",
@@ -42,5 +52,26 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.2"
+=======
+  "packageManager": "npm@11.6.2",
+  "dependencies": {
+    "@angular/common": "^21.1.1",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "bootstrap": "^5.3.8",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.1",
+    "@angular/cli": "^21.1.1",
+    "@angular/compiler-cli": "^21.1.0",
+    "jsdom": "^27.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+>>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
   }
 }
