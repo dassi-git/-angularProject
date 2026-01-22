@@ -114,22 +114,48 @@ export class Cart implements OnInit, OnDestroy {
 
   confirmPurchase(): void {
     const user = this.authService.getCurrentUser();
-    if (!user) return;
+    if (!user) {
+      alert('עליך להתחבר כדי לבצע רכישה');
+      return;
+    }
 
     this.isLoading = true;
-    const userId = 1;
+    
+    // חילוץ userId אמיתי
+    let userId: number;
+    if (user.id) {
+      userId = user.id;
+    } else if (user.email && !isNaN(parseInt(user.email))) {
+      userId = parseInt(user.email);
+    } else {
+      userId = 1; // ברירת מחדל
+    }
+    
+    console.log('מאשר רכישה עבור משתמש:', userId);
     
     this.orderService.confirmOrder(userId).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('רכישה אושרה:', response);
         this.orderService.clearCart();
         this.cartItems = [];
         this.totalAmount = 0;
         this.isLoading = false;
         alert('הרכישה אושרה בהצלחה!');
       },
-      error: () => {
+      error: (error) => {
+        console.error('שגיאה באישור רכישה:', error);
         this.isLoading = false;
-        alert('שגיאה באישור הרכישה');
+        
+        let errorMessage = 'שגיאה באישור הרכישה';
+        if (error.status === 400) {
+          errorMessage = 'נתונים לא תקינים';
+        } else if (error.status === 401) {
+          errorMessage = 'נדרשת התחברות מחדש';
+        } else if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        }
+        
+        alert(errorMessage);
       }
     });
   }
