@@ -163,15 +163,23 @@ export class OrderService {
 
   confirmOrder(userId: number): Observable<any> {
     const cart = this.getCart();
-    const totalAmount = 0; // יחושב בצד השרת
     
-    const order: Order = {
-      userId,
-      totalAmount,
+    if (cart.length === 0) {
+      throw new Error('הסל ריק');
+    }
+    
+    const orderRequest = {
+      userId: userId,
+      totalAmount: 0, // יחושב בשרת
       isDraft: false, // הזמנה סופית
-      orderItems: cart
+      orderItems: cart.map(item => ({
+        giftId: item.giftId,
+        quantity: item.quantity
+      }))
     };
 
-    return this.createOrder(order);
+    console.log('שליחת בקשת אישור רכישה:', orderRequest);
+    
+    return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest);
   }
 }
