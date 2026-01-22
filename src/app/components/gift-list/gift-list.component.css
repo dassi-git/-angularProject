@@ -187,9 +187,57 @@
   background: #fafafa;
 }
 
-.buy-ticket-btn {
+.add-to-cart-btn {
   width: 100%;
   background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.add-to-cart-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-to-cart-btn.loading {
+  background: #6c757d;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff40;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* תמיכה ישנה לכפתור קנייה */
+.buy-ticket-btn {
+  width: 100%;
+  background: #007bff;
   color: white;
   border: none;
   padding: 12px;
@@ -201,7 +249,7 @@
 }
 
 .buy-ticket-btn:hover {
-  background: #218838;
+  background: #0056b3;
 }
 
 .no-gifts {

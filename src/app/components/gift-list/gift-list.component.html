@@ -85,7 +85,22 @@
       
       <!-- תחתית הכרטיס -->
       <div class="gift-footer">
-        <button class="buy-ticket-btn">קנה כרטיס</button>
+        <!-- כפתור הוספה לסל עם טיפול במצב טעינה -->
+        <button 
+          class="add-to-cart-btn" 
+          (click)="addToCart(gift)"
+          [disabled]="isAddingToCart(gift.id)"
+          [class.loading]="isAddingToCart(gift.id)"
+          [title]="authService.isAuthenticated() ? 'הוסף לסל' : 'נדרשת התחברות'">
+          
+          <!-- איקון טעינה -->
+          <span *ngIf="isAddingToCart(gift.id)" class="loading-spinner"></span>
+          
+          <!-- טקסט הכפתור -->
+          <span *ngIf="!isAddingToCart(gift.id) && authService.isAuthenticated()">הוסף לסל</span>
+          <span *ngIf="!isAddingToCart(gift.id) && !authService.isAuthenticated()">התחבר להוספה</span>
+          <span *ngIf="isAddingToCart(gift.id)">מוסיף...</span>
+        </button>
       </div>
     </div>
   </div>

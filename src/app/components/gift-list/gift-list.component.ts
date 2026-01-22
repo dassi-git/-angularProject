@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GiftService } from '../../services';
+import { Router } from '@angular/router';
+import { GiftService, OrderService, AuthService } from '../../services';
 import { Gift } from '../../models';
 
 /**
@@ -31,9 +32,15 @@ export class GiftListComponent implements OnInit {
   // הגדרות סינון
   selectedCategory = ''; // קטגוריה נבחרת לסינון
   categories: string[] = []; // רשימת כל הקטגוריות הזמינות
+  
+  // מצב הוספה לסל
+  addingToCart: { [giftId: number]: boolean } = {}; // מעקב אחר מתנות שמתווספות לסל
 
   constructor(
     private giftService: GiftService, // שירות לטעינת מתנות
+    private orderService: OrderService, // שירות להזמנות וסל קניות
+    public authService: AuthService, // שירות אימות - ציבורי לשימוש בתבנית
+    private router: Router, // ניווט בין עמודים
     private cdr: ChangeDetectorRef // לזיהוי שינויים ידני
   ) {
     console.log('GiftListComponent constructor');
@@ -150,5 +157,88 @@ export class GiftListComponent implements OnInit {
    */
   trackByGiftId(index: number, gift: Gift): number {
     return gift.id;
+  }
+
+  /**
+   * מוסיף מתנה לסל הקניות
+   * קורא ל-PlaceOrderAsync ב-API עם IsDraft = true
+   * בודק ראשית אם המשתמש מחובר
+   */
+  addToCart(gift: Gift): void {
+    console.log('פונקציית addToCart נקראת עבור מתנה:', gift.name);
+    
+    // בדיקה אם המשתמש מחובר
+    const isAuthenticated = this.authService.isAuthenticated();
+    const currentUser = this.authService.getCurrentUser();
+    console.log('מצב אימות:', { isAuthenticated, currentUser });
+    
+    if (!isAuthenticated) {
+      alert('עליך להתחבר כדי להוסיף מתנות לסל');
+      this.router.navigate(['/login']); // הפניה לדף הכניסה
+      return;
+    }
+
+    // מניעת לחיצות מרובות
+    if (this.addingToCart[gift.id]) {
+      console.log('כבר בתהליך הוספה לסל');
+      return;
+    }
+
+    this.addingToCart[gift.id] = true;
+    console.log('מתחיל הוספה לסל:', gift.name);
+
+    this.orderService.addToCartAsync(gift.id, 1).subscribe({
+      next: (response) => {
+        console.log('המתנה נוספה לשרת בהצלחה:', response);
+        
+        // עדכון הסל המקומי עם נתוני המתנה
+        this.orderService.addToCart(gift.id, 1, gift);
+        
+        this.addingToCart[gift.id] = false;
+        this.cdr.detectChanges(); // עדכון מפורש של הממשק
+        
+        // הודעת הצלחה למשתמש
+        alert(`המתנה "${gift.name}" נוספה לסל בהצלחה!`);
+      },
+      error: (error) => {
+        console.error('שגיאה מפורטת בהוספה לסל:', {
+          status: error.status,
+          statusText: error.statusText,
+          error: error.error,
+          message: error.message,
+          fullError: error
+        });
+        
+        this.addingToCart[gift.id] = false;
+        this.cdr.detectChanges(); // עדכון מפורש של הממשק
+        
+        // טיפול בשגיאות שונות
+        let errorMessage = 'שגיאה בהוספת המתנה לסל';
+        
+        if (error.status === 401) {
+          errorMessage = 'נדרשת התחברות מחדש';
+          this.router.navigate(['/login']); // הפניה לכניסה
+        } else if (error.status === 403) {
+          errorMessage = 'אין הרשאה לבצע פעולה זו';
+        } else if (error.status === 400) {
+          errorMessage = 'בקשה לא תקינה - בדוק את הנתונים';
+        } else if (error.status === 500) {
+          errorMessage = 'שגיאת שרת פנימית';
+        } else if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.error && typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+        
+        alert(`${errorMessage}\n\nפרטים טכניים: ${error.status || 'לא ידוע'}`);
+      }
+    });
+  }
+
+  /**
+   * בודק אם מתנה ספציפית בתהליך הוספה לסל
+   */
+  isAddingToCart(giftId: number): boolean {
+    return !!this.addingToCart[giftId];
   }
 }

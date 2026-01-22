@@ -1,12 +1,19 @@
+/**
+ * מודל משתמש
+ */
 export interface User {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  role: string;
+  id?: number; // מזהה ייחודי (אופציונלי)
+  name: string; // שם המשתמש
+  email: string; // כתובת אימייל
+  phone: string; // מספר טלפון
+  password: string; // סיסמה
+  role: string; // תפקיד (לקוח/מנהל)
 }
 
+/**
+ * מודל לכניסה
+ */
 export interface LoginDTO {
-  email: string;
-  password: string;
+  email: string; // כתובת אימייל
+  password: string; // סיסמה
 }

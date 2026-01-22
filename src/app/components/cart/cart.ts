@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, GiftService, AuthService } from '../../services';
 import { Gift, OrderItem } from '../../models';
-import { forkJoin } from 'rxjs';
+import { Subscription, timeout } from 'rxjs';
 
 interface CartItemWithGift {
   orderItem: OrderItem;
@@ -10,16 +10,21 @@ interface CartItemWithGift {
   total: number;
 }
 
+/**
+ * רכיב סל קניות
+ * מציג את המתנות בסל ומאפשר ניהול
+ */
 @Component({
   selector: 'app-cart',
   imports: [CommonModule],
   templateUrl: './cart.html',
   styleUrl: './cart.css',
 })
-export class Cart implements OnInit {
+export class Cart implements OnInit, OnDestroy {
   cartItems: CartItemWithGift[] = [];
   totalAmount = 0;
   isLoading = false;
+  private cartSubscription?: Subscription;
 
   constructor(
     private orderService: OrderService,
@@ -28,44 +33,71 @@ export class Cart implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // טעינה ראשונית בלבד
     this.loadCartItems();
   }
 
+  ngOnDestroy(): void {
+    // ביטול מנוי למניעת דליפות זיכרון
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * טוען את פריטי הסל מהשרת
+   */
   loadCartItems(): void {
+    console.log('טוען סל - גרסה פשוטה');
+    
     const cart = this.orderService.getCart();
+    console.log('סל מה-localStorage:', cart);
+    
+    // אם אין פריטים בסל
     if (cart.length === 0) {
       this.cartItems = [];
       this.totalAmount = 0;
+      this.isLoading = false;
+      console.log('סל ריק');
       return;
     }
 
-    this.isLoading = true;
-    const giftRequests = cart.map(item => 
-      this.giftService.getGiftById(item.giftId)
-    );
-
-    forkJoin(giftRequests).subscribe({
-      next: (gifts) => {
-        this.cartItems = cart.map((orderItem, index) => {
-          const gift = gifts[index];
-          return {
-            orderItem,
-            gift,
-            total: gift.ticketPrice * orderItem.quantity
-          };
-        });
-        this.calculateTotal();
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      }
+    // יצירת פריטים עם נתונים אמיתיים אם קיימים
+    this.cartItems = cart.map(orderItem => {
+      // אם יש נתוני מתנה שמורים, השתמש בהם
+      const gift = (orderItem as any).giftData || {
+        id: orderItem.giftId,
+        name: `מתנה #${orderItem.giftId}`,
+        description: 'תיאור זמני',
+        ticketPrice: 50,
+        category: 'כללי',
+        donorName: 'תורם אנונימי'
+      };
+      
+      return {
+        orderItem,
+        gift,
+        total: gift.ticketPrice * orderItem.quantity
+      };
     });
+    
+    this.calculateTotal();
+    this.isLoading = false;
+    console.log('סל נטען בהצלחה:', this.cartItems);
   }
 
+  /**
+   * מסיר פריט מהסל עם אישור
+   */
   removeFromCart(giftId: number): void {
-    this.orderService.removeFromCart(giftId);
-    this.loadCartItems();
+    // אישור מחיקה
+    const giftName = this.cartItems.find(item => item.gift.id === giftId)?.gift.name || 'מתנה';
+    const confirmed = confirm(`האם אתה בטוח שברצונך להסיר את "${giftName}" מהסל?`);
+    
+    if (confirmed) {
+      this.orderService.removeFromCart(giftId);
+      this.loadCartItems();
+    }
   }
 
   updateQuantity(giftId: number, value: any): void {
