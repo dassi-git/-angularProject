@@ -21,6 +21,16 @@ export class OrderService {
     private authService: AuthService // לקבלת פרטי המשתמש המחובר
   ) {
     this.loadCartFromStorage();
+    
+    // ניקוי הסל כשמשתמש מתנתק
+    this.authService.currentUser$.subscribe(user => {
+      if (!user) {
+        this.clearCart();
+      } else {
+        // טעינת סל ספציפי למשתמש
+        this.loadUserCart(user.id || user.email);
+      }
+    });
   }
 
   /**
@@ -109,13 +119,36 @@ export class OrderService {
   private updateCart(cart: OrderItem[]): void {
     console.log('מעדכן סל:', cart);
     this.cartSubject.next(cart);
-    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      const userId = currentUser.id || currentUser.email;
+      localStorage.setItem(`cart_${userId}`, JSON.stringify(cart));
+    }
   }
 
   private loadCartFromStorage(): void {
-    const saved = localStorage.getItem('cart');
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.cartSubject.next([]);
+      return;
+    }
+    
+    const userId = currentUser.id || currentUser.email;
+    const saved = localStorage.getItem(`cart_${userId}`);
     if (saved) {
       this.cartSubject.next(JSON.parse(saved));
+    } else {
+      this.cartSubject.next([]);
+    }
+  }
+
+  private loadUserCart(userId: any): void {
+    const saved = localStorage.getItem(`cart_${userId}`);
+    if (saved) {
+      this.cartSubject.next(JSON.parse(saved));
+    } else {
+      this.cartSubject.next([]);
     }
   }
 
