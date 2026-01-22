@@ -30,6 +30,12 @@
 					</tr>
 				</thead>
 				<tbody>
+<!-- 3. לולאת הנתונים (*ngFor="let g of gifts()")
+זהו "לב המערכת":
+
+*ngFor: פקודה שאומרת לאנגולר: "עבור על כל מתנה (g) שנמצאת בתוך המערך gifts(), ושכפל עבורה שורת טבלה (<tr>) חדשה".
+
+Interpolation ({{ g.name }}): הסוגריים המסולסלים הכפולים מושכים את הנתון הספציפי מהאובייקט ומציגים אותו בתוך התא. -->
 					<tr *ngFor="let g of gifts()">
 						<td class="col-number mono">{{ g.number }}</td>
 						<td class="col-name">{{ g.name }}</td>
