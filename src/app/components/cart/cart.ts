@@ -136,7 +136,7 @@ export class Cart implements OnInit, OnDestroy {
         console.log('רכישה אושרה:', response);
         this.orderService.clearCart();
         this.loadCartItems(); // רענון הסל
-        this.loadOrders(); // רענון ההזמנות
+        // this.loadOrders(); // רענון ההזמנות
         this.isLoading = false;
         alert('הרכישה אושרה בהצלחה!');
       },

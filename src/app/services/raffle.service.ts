@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable ,inject} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Winner } from '../models';
 import { environment } from '../../environments/environment';
+
+
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +14,8 @@ import { environment } from '../../environments/environment';
 export class RaffleService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
-
+  constructor() {}
+  private http = inject(HttpClient);
   conductRaffle(giftId: number): Observable<Winner> {
     return this.http.post<Winner>(`${this.apiUrl}/Raffle/conduct/${giftId}`, {});
   }

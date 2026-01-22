@@ -1,23 +1,14 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "bundler",
     "outDir": "./out-tsc/spec",
     "types": [
-<<<<<<< HEAD
       "jasmine"
     ]
   },
   "include": [
-    "src/**/*.ts"
-=======
-      "vitest/globals"
-    ]
-  },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.spec.ts"
->>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
   ]
 }

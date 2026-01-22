@@ -4,7 +4,10 @@
   "compileOnSave": false,
   "compilerOptions": {
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     "noImplicitOverride": true,
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -13,16 +16,14 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "ESNext",
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-<<<<<<< HEAD
     "typeCheckHostBindings": true,
-=======
->>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
+
     "strictTemplates": true
   },
   "files": [],
