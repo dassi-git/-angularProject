@@ -79,14 +79,14 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  editDonor(donor: Donor): void {
+  editDonor(donor: Donor ): void {
     this.editingDonor = { ...donor };
   }
 
   updateDonor(): void {
     if (!this.editingDonor) return;
     
-    this.donorService.updateDonor(this.editingDonor).subscribe({
+    this.donorService.updateDonor(this.editingDonor.id,this.editingDonor).subscribe({
       next: () => {
         this.loadDonors();
         this.editingDonor = null;

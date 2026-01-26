@@ -9,7 +9,7 @@ import { Donor } from '../../models/donor.model';
   selector: 'app-donor-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './donor-list.component.html'
+  templateUrl: './donor.html',
 })
 export class DonorListComponent {
   // הזרקת השירות (Dependency Injection) בשיטה המודרנית
@@ -41,7 +41,25 @@ export class DonorListComponent {
       });
     }
   }
+editingDonorId: number | null = null;
 
+onEdit(donor: Donor) {
+  this.editingDonorId = donor.id;
+  this.newDonor = { ...donor }; // העתקת הנתונים לטופס
+}
+
+updateDonor() {
+  if (this.editingDonorId) {
+    this.donorService.updateDonor(this.editingDonorId, this.newDonor).subscribe({
+      next: () => {
+        alert('התורם עודכן!');
+        this.editingDonorId = null;
+        this.newDonor = { name: '', email: '', address: '', IsDeleted: false };
+      }
+    });
+  }
+}
+  
   // פונקציה למחיקה
   onDelete(id: number) {
     if (confirm('האם את בטוחה שברצונך למחוק תורם זה?')) {
