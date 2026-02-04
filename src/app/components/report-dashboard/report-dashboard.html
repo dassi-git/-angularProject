@@ -1,0 +1,36 @@
+<p>report-dashboard works!</p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>דוח הכנסות</h5>
+          </div>
+          <div class="card-body">
+            <h3 class="text-success">₪{{ revenueReport.totalRevenue || 0 }}</h3>
+            <p class="text-muted">סה"כ הכנסות</p>
+            <hr>
+            <p><strong>סה"כ הזמנות:</strong> {{ revenueReport.totalOrders || 0 }}</p>
+            <p><strong>סה"כ כרטיסים:</strong> {{ revenueReport.totalTickets || 0 }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>זוכים אחרונים</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="winners.length === 0" class="text-muted">
+              עדיין לא בוצעו הגרלות
+            </div>
+            <div *ngFor="let winner of winners" class="mb-2">
+              <strong>{{ winner.giftName }}</strong><br>
+              <small class="text-muted">זוכה: {{ winner.winnerName }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+

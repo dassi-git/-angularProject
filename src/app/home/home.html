@@ -1,0 +1,45 @@
+<div class="home-hero d-flex align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <div class="glass-card p-5 shadow-lg">
+          
+          <div class="badge-gold mb-3">2026</div>
+          <h1 class="display-3 mb-3 main-title">ברוכים הבאים</h1>
+          <h2 class="subtitle mb-4">לאתר ההגרלה הסינית הגדול</h2>
+          <p class="lead mb-5 text-white-50">הזדמנות פז לזכות בפרסים יקרי ערך ולתרום למטרה נעלה.</p>
+
+          <div class="d-grid gap-3 col-lg-8 mx-auto">
+            
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <a routerLink="/register" class="btn btn-primary-glass w-100 py-3">
+                  <i class="bi bi-person-plus"></i> הרשמה
+                </a>
+              </div>
+              <div class="col-6">
+                <a routerLink="/login" class="btn btn-outline-white w-100 py-3">
+                  <i class="bi bi-box-arrow-in-right"></i> התחברות
+                </a>
+              </div>
+            </div>
+
+            <a routerLink="/List" class="btn btn-gold-action py-3 mb-2 shadow">
+              <i class="bi bi-gift-fill me-2"></i> צפייה בקטלוג המתנות
+            </a>
+
+            <button (click)="logout()" class="btn btn-link-logout py-2 mt-2">
+              <i class="bi bi-power"></i> התנתקות מהמערכת
+            </button>
+          </div>
+
+          <div class="mt-5 pt-4 border-top border-white-10">
+            <a routerLink="/admin" class="admin-link text-decoration-none">
+               <i class="bi bi-shield-lock"></i> כניסה לממשק מנהל
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

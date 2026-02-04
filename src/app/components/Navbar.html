@@ -1,0 +1,38 @@
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">מכירה סינית</a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/catalog">קטלוג מתנות</a>
+        </li>
+
+        @if (authService.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link text-danger" routerLink="/admin/donors">ניהול תורמים</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" routerLink="/admin/gifts">ניהול מתנות</a>
+          </li>
+        }
+
+        @if (authService.isLoggedIn() && !authService.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cart">הסל שלי 🛒</a>
+          </li>
+        }
+      </ul>
+
+      <div class="d-flex">
+        @if (!authService.isLoggedIn()) {
+          <a class="btn btn-outline-primary me-2" routerLink="/login">התחברות</a>
+          <a class="btn btn-primary" routerLink="/register">הרשמה</a>
+        } @else {
+          <span class="navbar-text me-3">שלום, {{ authService.currentUser()?.name }}</span>
+          <button class="btn btn-outline-secondary" (click)="authService.logout()">התנתק</button>
+        }
+      </div>
+    </div>
+  </div>
+</nav> -->

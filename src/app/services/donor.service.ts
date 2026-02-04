@@ -24,8 +24,8 @@ export class DonorService {
     return this.http.post<Donor>(this.apiUrl, donor);
   }
 
-  updateDonor(donor: Donor): Observable<Donor> {
-    return this.http.put<Donor>(`${this.apiUrl}/${donor.id}`, donor);
+  updateDonor( id: number, donor: any): Observable<Donor> {
+    return this.http.put<any>(`${this.apiUrl}/${donor.id}`, donor);
   }
 
   deleteDonor(id: number): Observable<void> {

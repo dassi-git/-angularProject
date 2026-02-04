@@ -1,0 +1,38 @@
+<p>navbar works!</p>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">מכירה סינית</a>
+
+    
+     <nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">מתנות</a>
+
+    <div class="navbar-nav">
+      <a class="nav-link" routerLink="/">קטלוג</a>
+
+      @if (authService.isAdmin()) {
+        <a class="nav-link text-danger" routerLink="/donors">ניהול תורמים</a>
+        <a class="nav-link text-danger" routerLink="/admin-gifts">עריכת מתנות</a>
+      }
+
+      @if (authService. isAuthenticated() && !authService.isAdmin()) {
+        <a class="nav-link" routerLink="/cart">הסל שלי 🛒</a>
+      }
+    </div>
+
+    <div class="ms-auto">
+      @if (authService.currentUser$ | async; as user) {
+        <span class="me-2">שלום, {{ user.name }}</span>
+        <button (click)="onLogout()" class="btn btn-sm btn-secondary">התנתק</button>
+      } @else {
+        <a class="btn btn-primary btn-sm me-2" routerLink="/login">התחברות</a>
+        <a class="btn btn-outline-primary btn-sm" routerLink="/register">הרשמה</a>
+      }
+    </div>
+  </div>
+</nav>
+
+
+  </div>
+</nav>

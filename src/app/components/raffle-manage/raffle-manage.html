@@ -1,0 +1,35 @@
+<p>raffle-manage works!</p>
+ 
+    <div class="card">
+      <div class="card-header">
+        <h5>ניהול הגרלות</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>מתנה</th>
+              <th>תורם</th>
+              <th>מחיר כרטיס</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let gift of gifts">
+              <td>{{ gift.name }}</td>
+              <td>{{ gift.donorName }}</td>
+              <td>₪{{ gift.ticketPrice }}</td>
+              <td>
+                <button 
+                  class="btn btn-success btn-sm"
+                  (click)="conductRaffle(gift.id)"
+                  [disabled]="isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  בצע הגרלה
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

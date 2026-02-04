@@ -1,8 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { DonorService } from '../../services/donor.service';
+import { AdminService } from '../../services/Admin'; // השתמשי בסרביס המאוחד שלך
 import { Donor } from '../../models/donor.model';
 
 @Component({
@@ -11,61 +10,80 @@ import { Donor } from '../../models/donor.model';
   imports: [CommonModule, FormsModule],
   templateUrl: './donor.html',
 })
-export class DonorListComponent {
-  // הזרקת השירות (Dependency Injection) בשיטה המודרנית
-  private donorService = inject(DonorService);
+export class DonorListComponent implements OnInit {
+  private adminService = inject(AdminService);
 
-  // הפיכת ה-Observable של התורמים לסיגנל
-  // כך ה-HTML יתעדכן אוטומטית כשהנתונים יגיעו
-  donors = toSignal(this.donorService.getDonors(), { initialValue: [] });
+  // משתנים לניהול המדינה (State)
+  donors: Donor[] = [];
+  isLoading = false;
 
-  // אובייקט זמני ליצירת תורם חדש
-  newDonor: Omit<Donor, 'id' | 'gifts'> = {
-    name: '',
-    email: '',
-    address: '',
-    IsDeleted: false
-  };
+  // אובייקט זמני להוספה
+  newDonor: Donor = this.getEmptyDonor();
 
-  // פונקציה להוספת תורם
-  saveDonor() {
-    if (this.newDonor.name && this.newDonor.email) {
-      this.donorService.addDonor(this.newDonor).subscribe({
-        next: (savedDonor) => {
-          alert('התורם נוסף בהצלחה!');
-          // איפוס הטופס
-          this.newDonor = { name: '', email: '', address: '', IsDeleted: false };
-          // הערה: אם ה-Service שלך משתמש ב-tap וסיגנל פנימי, הרשימה תתעדכן לבד!
-        },
-        error: (err) => console.error('שגיאה בהוספת תורם', err)
-      });
-    }
+  // אובייקט זמני לעריכה (כאן הפתרון לשגיאה הקודמת!)
+  editingDonor: Donor | null = null;
+
+  ngOnInit() {
+    this.loadDonors();
   }
-editingDonorId: number | null = null;
 
-onEdit(donor: Donor) {
-  this.editingDonorId = donor.id;
-  this.newDonor = { ...donor }; // העתקת הנתונים לטופס
-}
-
-updateDonor() {
-  if (this.editingDonorId) {
-    this.donorService.updateDonor(this.editingDonorId, this.newDonor).subscribe({
-      next: () => {
-        alert('התורם עודכן!');
-        this.editingDonorId = null;
-        this.newDonor = { name: '', email: '', address: '', IsDeleted: false };
-      }
+  // טעינת רשימה
+  loadDonors() {
+    this.isLoading = true;
+    this.adminService.getDonors().subscribe({
+      next: (data) => {
+        this.donors = data;
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
     });
   }
-}
-  
-  // פונקציה למחיקה
-  onDelete(id: number) {
-    if (confirm('האם את בטוחה שברצונך למחוק תורם זה?')) {
-      this.donorService.deleteDonor(id).subscribe(() => {
-        alert('התורם נמחק');
+
+  // הוספת תורם
+  addDonor() {
+    if (!this.newDonor.name || !this.newDonor.email) return;
+    
+    this.adminService.addDonor(this.newDonor).subscribe(() => {
+      alert('התורם נוסף בהצלחה!');
+      this.newDonor = this.getEmptyDonor();
+      this.loadDonors(); // רענון הרשימה מהשרת
+    });
+  }
+
+  // מעבר למצב עריכה
+  onEdit(donor: Donor) {
+    // יצירת עותק כדי לא לשנות את המקור בטבלה בזמן שמקלידים
+    this.editingDonor = { ...donor };
+  }
+
+  // ביטול עריכה
+  cancelEdit() {
+    this.editingDonor = null;
+  }
+
+  // עדכון תורם
+  updateDonor() {
+    if (this.editingDonor && this.editingDonor.id) {
+      this.adminService.updateDonor(this.editingDonor).subscribe(() => {
+        alert('הנתונים עודכנו!');
+        this.editingDonor = null;
+        this.loadDonors();
       });
     }
+  }
+
+  // מחיקה
+  onDelete(id: number | undefined) {
+    if (id && confirm('האם את בטוחה שברצונך למחוק תורם זה?')) {
+      this.adminService.deleteDonor(id).subscribe(() => {
+        alert('התורם נמחק');
+        this.loadDonors();
+      });
+    }
+  }
+
+  // פונקציית עזר לאיפוס אובייקט
+  private getEmptyDonor(): Donor {
+    return { name: '', email: '', address: '', IsDeleted: false };
   }
 }

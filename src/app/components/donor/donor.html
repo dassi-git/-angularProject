@@ -1,4 +1,4 @@
-<div class="container mt-4" dir="rtl">
+<!-- <div class="container mt-4" dir="rtl">
   
   <h2 class="mb-4">{{ editingDonorId ? 'עריכת תורם' : 'הוספת תורם חדש' }}</h2>
 
@@ -8,8 +8,8 @@
         <label class="form-label">שם מלא:</label>
         <input type="text" [(ngModel)]="newDonor.name" name="donor-name" #nameVar="ngModel" class="form-control" placeholder="הכנס שם">
       <!-- class="form-control" [class.is-invalid]="nameVar.invalid && nameVar.touched"> -->
-        
-        <div *ngIf="nameVar.invalid && nameVar.touched" class="text-danger small">
+         
+       <!-- <div *ngIf="nameVar.invalid && nameVar.touched" class="text-danger small">
           <span *ngIf="nameVar.errors?.['required']">חובה להזין שם.</span>
           <span *ngIf="nameVar.errors?.['minlength']">השם חייב להכיל לפחות 2 תווים.</span>
         </div>    </div>
@@ -74,4 +74,98 @@
     אין תורמים להצגה כרגע.
   </div>
 
+</div> -->
+
+
+
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">הוספת תורם חדש</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">שם מלא</label>
+            <input type="text" class="form-control" [(ngModel)]="newDonor.name" placeholder="הכנס שם">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">אימייל</label>
+            <input type="email" class="form-control" [(ngModel)]="newDonor.email" placeholder="example@mail.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">כתובת</label>
+            <input type="text" class="form-control" [(ngModel)]="newDonor.address" placeholder="רחוב, עיר">
+          </div>
+          <button class="btn btn-success w-100" (click)="addDonor()" [disabled]="!newDonor.name || !newDonor.email">
+            <i class="bi bi-plus-lg"></i> שמור תורם
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">רשימת תורמים קיימים</h5>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>שם</th>
+                <th>אימייל</th>
+                <th>כתובת</th>
+                <th class="text-center">פעולות</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let donor of donors">
+                <td>
+                  <span *ngIf="editingDonor?.id !== donor.id">{{ donor.name }}</span>
+                  <input *ngIf="editingDonor?.id === donor.id" type="text" class="form-control form-control-sm" [(ngModel)]="editingDonor!.name">
+                </td>
+
+                <td>
+                  <span *ngIf="editingDonor?.id !== donor.id">{{ donor.email }}</span>
+                  <input *ngIf="editingDonor?.id === donor.id" type="email" class="form-control form-control-sm" [(ngModel)]="editingDonor!.email">
+                </td>
+
+                <td>
+                  <span *ngIf="editingDonor?.id !== donor.id">{{ donor.address }}</span>
+                  <input *ngIf="editingDonor?.id === donor.id" type="text" class="form-control form-control-sm" [(ngModel)]="editingDonor!.address">
+                </td>
+
+                <td class="text-center">
+                  <div *ngIf="editingDonor?.id !== donor.id">
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="onEdit(donor)">עריכה</button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="onDelete(donor.id!)">מחיקה</button>
+                  </div>
+
+                  <div *ngIf="editingDonor?.id === donor.id">
+                    <button class="btn btn-sm btn-success me-1" (click)="updateDonor()">שמור</button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">ביטול</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="donors.length === 0 && !isLoading">
+                <td colspan="4" class="text-center py-4 text-muted">לא נמצאו תורמים ברשימה</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+ 
+
+
+ 
+
+
+  
