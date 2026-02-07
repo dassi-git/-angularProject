@@ -10,6 +10,7 @@ import { DonorListComponent } from './components/donor/donor';
 import { RaffleManage } from './components/raffle-manage/raffle-manage';
 import { ReportDashboard } from './components/report-dashboard/report-dashboard';
 import { Home } from './home/home';
+import { CatalogComponent } from './catalog/catalog';
 
 
 /**
@@ -17,10 +18,10 @@ import { Home } from './home/home';
  * מגדיר אילו רכיבים יוצגו באילו נתיבים
  */
 export const routes: Routes = [
-    { path: '',component:Home}, // דף הבית - פתוח לכולם
+    { path: '',component:Home, pathMatch: 'full'}, // דף הבית - פתוח לכולם
   { path: 'login', component: Login }, // דף כניסה - פתוח לכולם
   { path: 'register', component: Register }, // דף הרשמה - פתוח לכולם
-  { path: 'List',  component:GiftList }, // רשימת מתנות - פתוח לכולם
+  { path: 'catalog',  component:CatalogComponent }, // רשימת מתנות - פתוח לכולם
   // { path: 'my-orders', component: MyOrdersComponent, canActivate: [AuthGuard] }, // ההזמנות שלי - דורש אימות
   // { path: '', redirectTo: '', pathMatch: 'full' }, // נתיב ברירת מחדל - הפניה לרשימת 
   { 

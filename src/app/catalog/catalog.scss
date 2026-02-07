@@ -1,0 +1,166 @@
+// משתני צבעים ותצורה
+$primary-color: #6200ee;
+$secondary-color: #03dac6;
+$accent-color: #ff4081;
+$success-color: #2ecc71;
+$danger-color: #e74c3c;
+$bg-color: #f8f9fa;
+$card-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+$transition-speed: 0.3s;
+
+.catalog-container {
+  background-color: $bg-color;
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+
+  // כותרת עליונה
+  .catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
+
+    h1 {
+      color: #333;
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    .subtitle { color: #777; margin-top: 5px; }
+  }
+
+  // אזור טופס הניהול (למנהל בלבד)
+  .add-gift-form {
+    background: white;
+    border-right: 5px solid $primary-color;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: $card-shadow;
+    animation: slideIn 0.4s ease-out;
+
+    h3 { color: $primary-color; margin-top: 0; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+
+      input, select, textarea {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        &:focus { border-color: $primary-color; outline: none; }
+      }
+      textarea { grid-column: span 1; height: 48px; }
+    }
+  }
+
+  // גריד המתנות
+  .gift-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+
+  // כרטיס מתנה בודד
+  .gift-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform $transition-speed, box-shadow $transition-speed;
+
+    &:hover {
+      transform: translateY(-10px);
+      box-shadow: $card-shadow;
+    }
+
+    .image-container {
+      position: relative;
+      height: 220px;
+
+      img { width: 100%; height: 100%; object-fit: cover; }
+
+      .price-badge {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        background: $accent-color;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 50px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+    }
+
+    .card-content {
+      padding: 20px;
+
+      h3 { margin: 0 0 10px 0; color: #2c3e50; }
+      .description { color: #7f8c8d; font-size: 0.95rem; min-height: 45px; }
+      .donor-info { 
+        font-size: 0.85rem; 
+        color: #95a5a6;
+        span { color: $primary-color; font-weight: 600; }
+      }
+    }
+
+    // תחתית הכרטיס (כפתורים)
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #f1f1f1;
+
+      .btn-cart {
+        background: $success-color;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        &:hover { opacity: 0.9; }
+      }
+
+      .admin-quick-actions {
+        display: flex;
+        gap: 8px;
+        
+        .btn-icon {
+          background: #f1f1f1;
+          border: none;
+          padding: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+          &:hover { background: #e0e0e0; }
+          &.btn-danger:hover { background: $danger-color; color: white; }
+        }
+      }
+    }
+  }
+}
+
+// כפתורים כלליים
+.btn-primary { background: $primary-color; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; }
+.btn-success { background: $success-color; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; width: 100%; }
+
+// אנימציות
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// התאמה לניידים
+@media (max-width: 600px) {
+  .catalog-header { flex-direction: column; text-align: center; gap: 20px; }
+  .form-grid { grid-template-columns: 1fr !important; }
+}

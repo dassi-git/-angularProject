@@ -1,0 +1,64 @@
+<div class="catalog-container" dir="rtl">
+
+  <!-- HEADER -->
+  <header class="catalog-header">
+    <div class="title-section">
+      <h1>קטלוג מתנות - מכירה סינית</h1>
+      <p class="subtitle">בחרו מתנות וקנו כרטיסים 🎟️</p>
+    </div>
+
+    <!-- סל קניות – רק למשתמש מחובר -->
+    <button
+      *ngIf="isLoggedIn"
+      class="btn btn-outline-dark cart-btn"
+      (click)="openBasket()">
+      🛒 סל ({{ cartCount }})
+    </button>
+  </header>
+
+  <hr class="separator">
+
+  <!-- GRID -->
+  <main class="gift-grid">
+
+    <div class="gift-card" *ngFor="let gift of gifts">
+
+      <div class="image-container">
+        <img [src]="gift.imageUrl || 'https://via.placeholder.com/300x200'">
+        <div class="price-badge">{{ gift.ticketPrice }} ₪</div>
+      </div>
+
+      <div class="card-content">
+        <h3>{{ gift.name }}</h3>
+        <p class="description">{{ gift.description }}</p>
+
+        <!-- משתמש מחובר -->
+        <div *ngIf="isLoggedIn" class="card-footer">
+
+          <div class="quantity-box">
+            <label>כמות:</label>
+            <input
+              type="number"
+              min="1"
+              [(ngModel)]="gift.quantity"
+              name="qty{{gift.id}}">
+          </div>
+
+          <button
+            class="btn btn-outline-primary"
+            (click)="addToCart(gift)">
+            🛒 הוסף לסל
+          </button>
+
+        </div>
+
+        <!-- משתמש לא מחובר -->
+        <div *ngIf="!isLoggedIn" class="guest-msg">
+          🔒 יש להתחבר כדי להשתתף בהגרלה
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>

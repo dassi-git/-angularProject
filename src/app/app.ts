@@ -6,6 +6,7 @@ import { AuthService } from './services';
 import { DonorListComponent } from './components/donor/donor';
 import { NavbarComponent } from './components/navbar/navbar';
 import { Home} from './home/home';
+import { CatalogComponent } from './catalog/catalog';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink, CommonModule,GiftList,DonorListComponent,NavbarComponent,Home],

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [ RouterLink, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -20,7 +20,7 @@ export class Home implements OnInit {
 
   // פונקציית עזר למקרה שתרצי לנווט דרך כפתור ולא רק דרך לינק ישיר
   navigateToGifts() {
-    this.router.navigate(['/gifts']);
+    this.router.navigate(['/catalog']);
   }
 logout() {
     // מחיקת נתוני המשתמש (בהתאם לדרך בה את שומרת אותם)
