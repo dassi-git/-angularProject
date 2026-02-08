@@ -1,32 +1,71 @@
 import { Component, OnInit } from '@angular/core';
 import { GiftService } from '../services/gift.service';
 import { OrderService } from '../services/order.service';
-import { Gift } from '../models';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 @Component({
-  selector: 'app-catalog',        // השם שבו תשתמשי ב-HTML (כמו <app-catalog>)
-  standalone: true,             // בגרסאות חדשות זה בד"כ true
-  imports: [CommonModule, FormsModule], // דברים שהקומפוננטה צריכה
-  templateUrl: './catalog.html',  // ודאי שהנתיב לקובץ ה-HTML שלך נכון
-  styleUrls: ['./catalog.scss']   // ודאי שהנתיב ל-SCSS נכון
+  selector: 'app-catalog',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './catalog.html',
+  styleUrls: ['./catalog.scss']
 })
 export class CatalogComponent implements OnInit {
-gifts:any[] = []
-categories: any[] = [];
+
+  gifts: any[] = [];
+  categories: any[] = [];
+
   isManager = false;
   isLoggedIn = false;
+
+  cartCount = 0;            // ✅ נדרש ל־HTML
   showAddForm = false;
-  newGift: any = { name: '', ticketPrice: 0, imageUrl: '', categoryId: null, description: '' };
 
-  constructor(private giftService: GiftService, private orderService: OrderService) {}
+  newGift: any = {
+    name: '',
+    ticketPrice: 0,
+    imageUrl: '',
+    categoryId: null,
+    description: ''
+  };
 
-  ngOnInit() {
+  constructor(
+    private giftService: GiftService,
+    private orderService: OrderService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+
+    // טעינת מתנות
     this.loadGifts();
+
+    // בדיקת משתמש מחובר
+    this.authService.currentUser$.subscribe(user => {
+      this.isLoggedIn = !!user;
+      this.isManager = user?.role === 'Manager';
+    });
+
+    // מונה פריטים בסל
+    this.orderService.cart$.subscribe(items => {
+      this.cartCount = items.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+    });
   }
 
   loadGifts() {
-    this.giftService.getGifts().subscribe(g => this.gifts = g);
+    this.giftService.getGifts().subscribe(g => {
+      this.gifts = g.map(gift => ({
+        ...gift,
+        quantity: 1   // כמות ברירת מחדל
+      }));
+    });
   }
 
   toggleAddForm() {
@@ -37,12 +76,18 @@ categories: any[] = [];
     this.giftService.addGift(this.newGift).subscribe(() => {
       this.loadGifts();
       this.showAddForm = false;
-      this.newGift = { name: '', ticketPrice: 0, imageUrl: '', categoryId: null, description: '' };
+      this.newGift = {
+        name: '',
+        ticketPrice: 0,
+        imageUrl: '',
+        categoryId: null,
+        description: ''
+      };
     });
   }
 
   onEdit(gift: any) {
-    // open edit form or navigate to edit route
+    // future: edit route
   }
 
   onDelete(id: number) {
@@ -50,7 +95,16 @@ categories: any[] = [];
     this.giftService.deleteGift(id).subscribe(() => this.loadGifts());
   }
 
+  // ✅ הוספה לסל – רק אם מחובר
   addToCart(gift: any) {
-    this.orderService.addToCart(gift);
+    if (!this.isLoggedIn) return;
+
+    this.orderService.addToCartAsync(gift.id, gift.quantity || 1)
+      .subscribe();
+  }
+
+  // ✅ נדרש ל־HTML
+  openBasket() {
+    this.router.navigate(['/basket']);
   }
 }
