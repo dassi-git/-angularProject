@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/Admin';
+import { ToastService } from '../../services/toast.service';
 import { Donor } from '../../models/donor.model';
 
 @Component({
@@ -13,6 +14,7 @@ import { Donor } from '../../models/donor.model';
 export class DonorListComponent implements OnInit {
   private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
   donors: Donor[] = [];
   isLoading = false;
@@ -41,8 +43,8 @@ export class DonorListComponent implements OnInit {
   addDonor() {
     if (!this.newDonor.name || !this.newDonor.email) return;
     
-    console.log('Current user:', this.adminService);
-    console.log('Token:', localStorage.getItem('auth_token'));
+
+
     
     const donorToAdd: any = {
       name: this.newDonor.name.trim(),
@@ -50,7 +52,7 @@ export class DonorListComponent implements OnInit {
       address: this.newDonor.address?.trim() || ''
     };
     
-    console.log('Sending donor:', donorToAdd);
+
     
     this.adminService.addDonor(donorToAdd).subscribe({
       next: () => {
@@ -63,7 +65,7 @@ export class DonorListComponent implements OnInit {
         console.error('Error details:', err.error);
         console.error('Validation errors:', err.error?.errors);
         const errorMsg = err.error?.errors ? JSON.stringify(err.error.errors) : 'שגיאה בהוספת התורם';
-        this.toastService.success(errorMsg);
+        this.toastService.error(errorMsg);
       }
     });
   }
@@ -96,7 +98,7 @@ export class DonorListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error updating donor:', err);
-          this.toastService.success('שגיאה בעדכון התורם');
+          this.toastService.error('שגיאה בעדכון התורם');
         }
       });
     }

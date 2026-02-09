@@ -43,14 +43,14 @@ export class GiftListComponent implements OnInit {
     private router: Router, // ניווט בין עמודים
     private cdr: ChangeDetectorRef // לזיהוי שינויים ידני
   ) {
-    console.log('GiftListComponent constructor');
+
   }
 
   /**
    * פונקציה שרצה בעת אתחול הרכיב
    */
   ngOnInit(): void {
-    console.log('GiftListComponent ngOnInit');
+
     this.loadGifts();
   }
 
@@ -60,18 +60,18 @@ export class GiftListComponent implements OnInit {
   loadGifts(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    console.log('Loading gifts...');
+
 
     this.giftService.getGifts().subscribe({
       next: (gifts) => {
-        console.log('Gifts loaded:', gifts);
+
         this.gifts = gifts || [];
         this.filteredGifts = [...this.gifts]; // יצירת עותק למתנות מסוננות
         this.extractCategories(); // חילוץ קטגוריות ייחודיות
         this.sortGifts(); // מיון ראשוני
         this.isLoading = false;
         this.cdr.detectChanges(); // עדכון ממשק המשתמש
-        console.log('Loading completed, isLoading:', this.isLoading);
+
       },
       error: (error) => {
         this.isLoading = false;
@@ -165,12 +165,12 @@ export class GiftListComponent implements OnInit {
    * בודק ראשית אם המשתמש מחובר
    */
   addToCart(gift: Gift): void {
-    console.log('פונקציית addToCart נקראת עבור מתנה:', gift.name);
+
     
     // בדיקה אם המשתמש מחובר
     const isAuthenticated = this.authService.isAuthenticated();
     const currentUser = this.authService.getCurrentUser();
-    console.log('מצב אימות:', { isAuthenticated, currentUser });
+
     
     if (!isAuthenticated) {
       alert('עליך להתחבר כדי להוסיף מתנות לסל');
@@ -180,16 +180,16 @@ export class GiftListComponent implements OnInit {
 
     // מניעת לחיצות מרובות
     if (this.addingToCart[gift.id]) {
-      console.log('כבר בתהליך הוספה לסל');
+
       return;
     }
 
     this.addingToCart[gift.id] = true;
-    console.log('מתחיל הוספה לסל:', gift.name);
+
 
     this.orderService.addToCartAsync(gift.id, 1).subscribe({
       next: (response) => {
-        console.log('המתנה נוספה לשרת בהצלחה:', response);
+
         
         // עדכון הסל המקומי עם נתוני המתנה
         this.orderService.addToCart(gift.id, 1, gift);

@@ -1,0 +1,58 @@
+/* Dark Mode for Catalog */
+body[data-theme="dark"] .catalog-container {
+  background-color: #111827 !important;
+}
+
+body[data-theme="dark"] .catalog-header h1 {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .catalog-header .subtitle {
+  color: #d1d5db !important;
+}
+
+body[data-theme="dark"] .gift-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+body[data-theme="dark"] .gift-card .card-content {
+  background: #1f2937 !important;
+}
+
+body[data-theme="dark"] .gift-card .card-content h3 {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .gift-card .card-content .description {
+  color: #d1d5db !important;
+}
+
+body[data-theme="dark"] .filters-section {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+body[data-theme="dark"] .filters-section .filter-group label {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .filters-section .filter-group input,
+body[data-theme="dark"] .filters-section .filter-group select {
+  background: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+
+body[data-theme="dark"] .filters-section .filter-actions button.btn-secondary {
+  background: #374151 !important;
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .empty-state-title {
+  color: #f9fafb !important;
+}
+
+body[data-theme="dark"] .empty-state-description {
+  color: #d1d5db !important;
+}

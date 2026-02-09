@@ -17,25 +17,25 @@ export class PurchasesReportComponent implements OnInit {
   isLoading = true;
 
   constructor() {
-    console.log('PurchasesReportComponent constructor called');
+
   }
 
   ngOnInit(): void {
-    console.log('PurchasesReportComponent initialized');
+
     this.loadPurchases();
   }
 
   loadPurchases(): void {
     this.isLoading = true;
-    console.log('מתחיל לטעון הזמנות...');
+
     
     this.orderService.getAllOrders().subscribe({
       next: (data) => {
-        console.log('התקבלו הזמנות:', data);
+
         this.purchases = data; // כל ההזמנות
-        console.log('כל ההזמנות:', this.purchases);
+
         this.isLoading = false;
-        console.log('isLoading set to false');
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -44,7 +44,7 @@ export class PurchasesReportComponent implements OnInit {
         this.isLoading = false;
       },
       complete: () => {
-        console.log('Observable completed');
+
       }
     });
   }

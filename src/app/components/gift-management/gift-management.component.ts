@@ -70,7 +70,7 @@ export class GiftManagementComponent {
       description: f.description || ''
     };
 
-    console.log('Sending gift data:', giftData);
+
 
     if (f.id) {
       giftData.id = f.id;

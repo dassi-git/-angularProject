@@ -352,3 +352,61 @@ $transition-speed: 0.3s;
     box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.1);
   }
 }
+
+
+// Dark Mode for Catalog
+html[data-theme="dark"] {
+  .catalog-container {
+    background-color: #111827 !important;
+  }
+
+  .catalog-header h1 {
+    color: #f9fafb !important;
+  }
+
+  .catalog-header .subtitle {
+    color: #d1d5db !important;
+  }
+
+  .gift-card {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+
+    .card-content {
+      h3 {
+        color: #f9fafb !important;
+      }
+
+      .description {
+        color: #d1d5db !important;
+      }
+    }
+  }
+
+  .filters-section {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+
+    .filter-group {
+      label {
+        color: #f9fafb !important;
+      }
+
+      input, select {
+        background: #374151 !important;
+        color: #f9fafb !important;
+        border-color: #4b5563 !important;
+      }
+    }
+  }
+
+  .empty-state {
+    .empty-state-title {
+      color: #f9fafb !important;
+    }
+
+    .empty-state-description {
+      color: #d1d5db !important;
+    }
+  }
+}

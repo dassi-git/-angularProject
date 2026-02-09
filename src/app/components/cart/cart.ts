@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, GiftService, AuthService } from '../../services';
 import { ToastService } from '../../services/toast.service';
@@ -31,7 +31,8 @@ export class Cart implements OnInit, OnDestroy {
     private orderService: OrderService,
     private giftService: GiftService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -48,17 +49,17 @@ export class Cart implements OnInit, OnDestroy {
    * טוען את פריטי הסל מהשרת
    */
   loadCartItems(): void {
-    console.log('טוען סל - גרסה פשוטה');
+
     
     const cart = this.orderService.getCart();
-    console.log('סל מה-localStorage:', cart);
+
     
     // אם אין פריטים בסל
     if (cart.length === 0) {
       this.cartItems = [];
       this.totalAmount = 0;
       this.isLoading = false;
-      console.log('סל ריק');
+
       return;
     }
 
@@ -83,7 +84,7 @@ export class Cart implements OnInit, OnDestroy {
     
     this.calculateTotal();
     this.isLoading = false;
-    console.log('סל נטען בהצלחה:', this.cartItems);
+
   }
 
   /**
@@ -131,15 +132,18 @@ export class Cart implements OnInit, OnDestroy {
       userId = 1; // ברירת מחדל
     }
     
-    console.log('מאשר רכישה עבור משתמש:', userId);
+
     
     this.orderService.confirmOrder(userId, this.totalAmount).subscribe({
       next: (response) => {
-        console.log('רכישה אושרה:', response);
+
         this.orderService.clearCart();
-        this.loadCartItems();
-        this.isLoading = false;
         this.toastService.success('הרכישה אושרה בהצלחה!');
+        setTimeout(() => {
+          this.loadCartItems();
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }, 0);
       },
       error: (error) => {
         console.error('שגיאה באישור רכישה:', error);

@@ -42,14 +42,14 @@ export class OrderService {
    */
   addToCartAsync(giftId: number, quantity: number = 1): Observable<any> {
     const currentUser = this.authService.getCurrentUser();
-    console.log('Current user in addToCartAsync:', currentUser);
+
     
     if (!currentUser || !currentUser.id || currentUser.id === 0) {
       throw new Error('אנא התחבר מחדש כדי להוסיף מוצרים לסל');
     }
 
     const userId: number = currentUser.id;
-    console.log('Using userId:', userId);
+
 
     // אם יש הזמנת טיוטה קיימת, נוסיף לה פריט
     if (this.currentDraftOrderId) {
@@ -67,6 +67,8 @@ export class OrderService {
         }
       ]
     };
+
+
 
     return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
       tap((response: any) => {
@@ -109,7 +111,7 @@ export class OrderService {
     }
     
     this.updateCart(cart);
-    console.log('סל מקומי עודכן:', cart);
+
   }
 
   removeFromCart(giftId: number): void {
@@ -127,7 +129,7 @@ export class OrderService {
    * מעדכן את הסל ומעדכן את כל המקשיבים
    */
   private updateCart(cart: OrderItem[]): void {
-    console.log('מעדכן סל:', cart);
+
     this.cartSubject.next(cart);
     
     const currentUser = this.authService.getCurrentUser();

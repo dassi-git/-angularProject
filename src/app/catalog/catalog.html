@@ -54,13 +54,13 @@
   <main class="gift-grid">
 
     <!-- Debug info -->
-    <div *ngIf="gifts.length === 0" style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fff3cd; border-radius: 10px;">
-      <h3>⚠️ לא נמצאו מתנות</h3>
-      <p>מספר מתנות במערך: {{ gifts.length }}</p>
-      <p>בודק חיבור לשרת...</p>
+    <div *ngIf="gifts.length === 0" class="empty-state" style="grid-column: 1/-1;">
+      <div class="empty-state-icon">🎁</div>
+      <h3 class="empty-state-title">אין מתנות זמינות</h3>
+      <p class="empty-state-description">כרגע אין מתנות זמינות לרכישה. חזור מאוחר יותר!</p>
     </div>
 
-    <div class="gift-card" *ngFor="let gift of gifts">
+    <div class="gift-card card-animate hover-lift" *ngFor="let gift of gifts; let i = index" [style.animation-delay]="(i * 0.1) + 's'">
 
       <div class="image-container">
         <img [src]="gift.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22%23999%22%3E' + gift.name + '%3C/text%3E%3C/svg%3E'" 
