@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { GiftService } from '../services/gift.service';
 import { OrderService } from '../services/order.service';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,15 @@ import { FormsModule } from '@angular/forms';
 export class CatalogComponent implements OnInit {
 
   gifts: any[] = [];
+  filteredGifts: any[] = [];
   categories: any[] = [];
+  donors: any[] = [];
+
+  // סינונים
+  searchName: string = '';
+  searchDonor: string = '';
+  searchCategory: string = '';
+  minPurchasers: number | null = null;
 
   isManager = false;
   isLoggedIn = false;
@@ -37,11 +46,14 @@ export class CatalogComponent implements OnInit {
     private orderService: OrderService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
     this.loadGifts();
+    this.loadCategories();
+    this.loadDonors();
 
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn = !!user;
@@ -58,14 +70,29 @@ export class CatalogComponent implements OnInit {
     });
   }
 
+  loadCategories() {
+    this.giftService.getGifts().subscribe(gifts => {
+      const uniqueCategories = [...new Set(gifts.map(g => g.category).filter(c => c))];
+      this.categories = uniqueCategories;
+    });
+  }
+
+  loadDonors() {
+    this.giftService.getGifts().subscribe(gifts => {
+      const uniqueDonors = [...new Set(gifts.map(g => g.donorName).filter(d => d))];
+      this.donors = uniqueDonors;
+    });
+  }
+
   loadGifts() {
-    this.giftService.getGifts().subscribe({
+    this.giftService.getGifts(this.searchName, this.searchDonor, this.minPurchasers).subscribe({
       next: (g) => {
         console.log('Gifts received:', g);
         this.gifts = g.map(gift => ({
           ...gift,
           quantity: 1
         }));
+        this.filteredGifts = this.gifts;
         console.log('Gifts array after mapping:', this.gifts);
         this.cdr.detectChanges();
       },
@@ -73,6 +100,18 @@ export class CatalogComponent implements OnInit {
         console.error('Error loading gifts:', err);
       }
     });
+  }
+
+  applyFilters() {
+    this.loadGifts();
+  }
+
+  clearFilters() {
+    this.searchName = '';
+    this.searchDonor = '';
+    this.searchCategory = '';
+    this.minPurchasers = null;
+    this.loadGifts();
   }
 
   hasWinner(gift: any): boolean {
@@ -112,13 +151,13 @@ export class CatalogComponent implements OnInit {
     this.orderService.addToCartAsync(gift.id, gift.quantity || 1)
       .subscribe({
         next: (response) => {
-          alert(`המתנה "${gift.name}" נוספה לסל!`);
+          this.toastService.success(`המתנה "${gift.name}" נוספה לסל!`);
           this.orderService.addToCart(gift.id, gift.quantity || 1, gift);
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error adding to cart:', err);
-          alert('שגיאה בהוספה לסל');
+          this.toastService.error('שגיאה בהוספה לסל');
         }
       });
   }

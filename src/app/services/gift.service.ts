@@ -17,10 +17,15 @@ export class GiftService {
   constructor(private http: HttpClient) {} // הזרקת HTTP client
 
   /**
-   * מחזיר את כל המתנות
+   * מחזיר את כל המתנות עם סינונים
    */
-  getGifts(): Observable<Gift[]> {
-    return this.http.get<Gift[]>(this.apiUrl);
+  getGifts(name?: string, donorName?: string, minPurchasers?: number | null): Observable<Gift[]> {
+    let params = new HttpParams();
+    if (name) params = params.set('name', name);
+    if (donorName) params = params.set('donorName', donorName);
+    if (minPurchasers) params = params.set('minPurchasers', minPurchasers.toString());
+    
+    return this.http.get<Gift[]>(this.apiUrl, { params });
   }
 
   /**

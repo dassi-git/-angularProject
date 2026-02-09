@@ -54,7 +54,7 @@ export class DonorListComponent implements OnInit {
     
     this.adminService.addDonor(donorToAdd).subscribe({
       next: () => {
-        alert('התורם נוסף בהצלחה!');
+        this.toastService.success('התורם נוסף בהצלחה!');
         this.newDonor = this.getEmptyDonor();
         this.loadDonors();
       },
@@ -63,7 +63,7 @@ export class DonorListComponent implements OnInit {
         console.error('Error details:', err.error);
         console.error('Validation errors:', err.error?.errors);
         const errorMsg = err.error?.errors ? JSON.stringify(err.error.errors) : 'שגיאה בהוספת התורם';
-        alert(errorMsg);
+        this.toastService.success(errorMsg);
       }
     });
   }
@@ -90,13 +90,13 @@ export class DonorListComponent implements OnInit {
       };
       this.adminService.updateDonor(donorToUpdate).subscribe({
         next: () => {
-          alert('הנתונים עודכנו!');
+          this.toastService.success('הנתונים עודכנו!');
           this.editingDonor = null;
           this.loadDonors();
         },
         error: (err) => {
           console.error('Error updating donor:', err);
-          alert('שגיאה בעדכון התורם');
+          this.toastService.success('שגיאה בעדכון התורם');
         }
       });
     }
@@ -106,7 +106,7 @@ export class DonorListComponent implements OnInit {
   onDelete(id: number | undefined) {
     if (id && confirm('האם את בטוחה שברצונך למחוק תורם זה?')) {
       this.adminService.deleteDonor(id).subscribe(() => {
-        alert('התורם נמחק');
+        this.toastService.success('התורם נמחק');
         this.loadDonors();
       });
     }

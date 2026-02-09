@@ -18,6 +18,38 @@
 
   <hr class="separator">
 
+  <!-- סינונים -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label>חיפוש לפי שם:</label>
+      <input type="text" [(ngModel)]="searchName" placeholder="שם המתנה">
+    </div>
+    <div class="filter-group">
+      <label>תורם:</label>
+      <select [(ngModel)]="searchDonor">
+        <option value="">כל התורמים</option>
+        <option *ngFor="let donor of donors" [value]="donor">{{ donor }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>קטגוריה:</label>
+      <select [(ngModel)]="searchCategory">
+        <option value="">כל הקטגוריות</option>
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>מינימום רוכשים:</label>
+      <input type="number" [(ngModel)]="minPurchasers" placeholder="0">
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" (click)="applyFilters()">חפש</button>
+      <button class="btn btn-secondary" (click)="clearFilters()">נקה</button>
+    </div>
+  </div>
+
+  <hr class="separator">
+
   <!-- GRID -->
   <main class="gift-grid">
 

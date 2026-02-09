@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, GiftService, AuthService } from '../../services';
+import { ToastService } from '../../services/toast.service';
 import { Gift, OrderItem } from '../../models';
 import { Subscription, timeout } from 'rxjs';
 
@@ -29,7 +30,8 @@ export class Cart implements OnInit, OnDestroy {
   constructor(
     private orderService: OrderService,
     private giftService: GiftService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +115,7 @@ export class Cart implements OnInit, OnDestroy {
   confirmPurchase(): void {
     const user = this.authService.getCurrentUser();
     if (!user) {
-      alert('עליך להתחבר כדי לבצע רכישה');
+      this.toastService.warning('עליך להתחבר כדי לבצע רכישה');
       return;
     }
 
@@ -135,14 +137,12 @@ export class Cart implements OnInit, OnDestroy {
       next: (response) => {
         console.log('רכישה אושרה:', response);
         this.orderService.clearCart();
-        this.loadCartItems(); // רענון הסל
-        // this.loadOrders(); // רענון ההזמנות
+        this.loadCartItems();
         this.isLoading = false;
-        alert('הרכישה אושרה בהצלחה!');
+        this.toastService.success('הרכישה אושרה בהצלחה!');
       },
       error: (error) => {
         console.error('שגיאה באישור רכישה:', error);
-        console.error('Error details:', error.error);
         this.isLoading = false;
         
         let errorMessage = 'שגיאה באישור הרכישה';
@@ -154,7 +154,7 @@ export class Cart implements OnInit, OnDestroy {
           errorMessage = error.error.message;
         }
         
-        alert(errorMessage);
+        this.toastService.error(errorMessage);
       }
     });
   }
