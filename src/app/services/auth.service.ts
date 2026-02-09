@@ -33,7 +33,11 @@ export class AuthService {
 
   login(credentials: LoginDTO): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
-      .pipe(tap(response => this.setSession(response)));
+      .pipe(tap(response => {
+        if (response.token) {
+          this.setSession(response);
+        }
+      }));
   }
 
   logout(): void {
@@ -63,9 +67,11 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, authResponse.token);
     
     if (authResponse.user) {
+      console.log('User from server:', authResponse.user);
       localStorage.setItem(this.userKey, JSON.stringify(authResponse.user));
       this.currentUserSubject.next(authResponse.user);
     } else {
+      console.log('No user in response, parsing token');
       // פרסור הטוקן לקבלת פרטי המשתמש
       const payload = this.parseJwtPayload(authResponse.token);
       console.log('JWT Payload:', payload);
@@ -87,6 +93,7 @@ export class AuthService {
         password: '',
         role: payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Customer'
       };
+      console.log('Created user object:', user);
       localStorage.setItem(this.userKey, JSON.stringify(user));
       this.currentUserSubject.next(user);
     }

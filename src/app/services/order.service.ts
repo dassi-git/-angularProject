@@ -44,11 +44,11 @@ export class OrderService {
     const currentUser = this.authService.getCurrentUser();
     console.log('Current user in addToCartAsync:', currentUser);
     
-    if (!currentUser) {
-      throw new Error('משתמש לא מחובר');
+    if (!currentUser || !currentUser.id || currentUser.id === 0) {
+      throw new Error('אנא התחבר מחדש כדי להוסיף מוצרים לסל');
     }
 
-    const userId: number = currentUser.id !== undefined ? currentUser.id : 1;
+    const userId: number = currentUser.id;
     console.log('Using userId:', userId);
 
     // אם יש הזמנת טיוטה קיימת, נוסיף לה פריט
@@ -58,13 +58,12 @@ export class OrderService {
 
     // אחרת, ניצור הזמנה חדשה
     const orderRequest = {
-      userId: userId,
-      totalAmount: 0.01,
-      isDraft: true,
-      orderItems: [
+      TotalAmount: 0.01,
+      IsDraft: true,
+      OrderItems: [
         {
-          giftId: giftId,
-          quantity: quantity
+          GiftId: giftId,
+          Quantity: quantity
         }
       ]
     };
@@ -81,8 +80,8 @@ export class OrderService {
 
   addItemToExistingOrder(orderId: number, giftId: number, quantity: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/Order/${orderId}/add-item`, {
-      giftId: giftId,
-      quantity: quantity
+      GiftId: giftId,
+      Quantity: quantity
     }, { responseType: 'text' });
   }
 
@@ -207,12 +206,11 @@ export class OrderService {
     }
     
     const orderRequest = {
-      userId: userId,
-      totalAmount: totalAmount,
-      isDraft: false,
-      orderItems: cart.map(item => ({
-        giftId: item.giftId,
-        quantity: item.quantity
+      TotalAmount: totalAmount,
+      IsDraft: false,
+      OrderItems: cart.map(item => ({
+        GiftId: item.giftId,
+        Quantity: item.quantity
       }))
     };
 
