@@ -57,3 +57,58 @@
 .btn {
   border-radius: 4px;
 }
+
+@media (max-width: 767px) {
+  .container {
+    padding: 10px;
+  }
+
+  .order-card {
+    margin-bottom: 15px;
+  }
+
+  .card-header {
+    padding: 10px;
+  }
+
+  .card-header h5 {
+    font-size: 1rem;
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 4px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+  }
+
+  .badge {
+    font-size: 0.7em;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding: 5px;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 6px 2px;
+  }
+
+  .card-header h5 {
+    font-size: 0.9rem;
+  }
+}

@@ -13,7 +13,7 @@ export interface Donor {
 export interface RevenueReport {
   totalRevenue: number;
   totalOrders: number;
-  totalTickets: number;
+  totalTicketsSold: number;
 }
 
 @Injectable({
@@ -24,47 +24,45 @@ export class AdminService {
   private http = inject(HttpClient);
 
   // 2. כתובת ה-API (שני אותה לכתובת השרת האמיתית שלך)
-  private apiUrl = 'http://localhost:5000/api/admin';
+  private apiUrl = 'http://localhost:5226/api';
 
   constructor() { }
 
   // --- חלק 1: ניהול תורמים ---
 
   getDonors(): Observable<Donor[]> {
-    return this.http.get<Donor[]>(`${this.apiUrl}/donors`);
+    return this.http.get<Donor[]>(`${this.apiUrl}/Donor`);
   }
 
   addDonor(donor: Donor): Observable<Donor> {
-    return this.http.post<Donor>(`${this.apiUrl}/donors`, donor);
+    return this.http.post<Donor>(`${this.apiUrl}/Donor`, donor);
   }
 
   updateDonor(donor: Donor): Observable<Donor> {
-    return this.http.put<Donor>(`${this.apiUrl}/donors/${donor.id}`, donor);
+    return this.http.put<Donor>(`${this.apiUrl}/Donor/${donor.id}`, donor);
   }
 
   deleteDonor(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/donors/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/Donor/${id}`);
   }
-
-  // --- חלק 2: ניהול מתנות והגרלות ---
 
   getGifts(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/gifts`);
+    return this.http.get<any[]>(`${this.apiUrl}/Gift`);
   }
 
-  // הפעולה שמפעילה את ההגרלה בשרת
   conductRaffle(giftId: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/raffles/draw/${giftId}`, {});
+    return this.http.post<any>(`${this.apiUrl}/Raffle/run/${giftId}`, {});
   }
 
-  // קבלת רשימת הזוכים
   getWinners(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/winners`);
+    return this.http.get<any[]>(`${this.apiUrl}/Winner`);
   }
-
-  // --- חלק 3: דוחות ---
 
   getRevenueReport(): Observable<RevenueReport> {
-    return this.http.get<RevenueReport>(`${this.apiUrl}/reports/revenue`);
+    return this.http.get<RevenueReport>(`${this.apiUrl}/Gift/sales-summary`);
+  }
+
+  getGiftsWithWinners(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Gift/gifts-with-winners`);
   }
 }

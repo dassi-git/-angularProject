@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GiftService } from '../../services';
+import { AdminService } from '../../services/Admin';
 import { Gift } from '../../models';
 
 @Component({
@@ -12,20 +13,31 @@ import { Gift } from '../../models';
   styleUrls: ['./gift-management.component.css']
 })
 export class GiftManagementComponent {
-  donors = ['אבי', 'דנה', 'רותי', 'יוסי'];
+  donors = signal<any[]>([]);
   gifts = signal<Gift[]>([]);
   editing = signal(false);
   form = signal<Partial<Gift>>({ ticketPrice: 10 });
   error = signal('');
 
-  constructor(private giftService: GiftService) {
+  constructor(private giftService: GiftService, private adminService: AdminService) {
     this.loadGifts();
+    this.loadDonors();
+  }
+
+  private loadDonors() {
+    this.adminService.getDonors().subscribe({
+      next: (donors) => this.donors.set(donors || []),
+      error: (error) => console.error('Error loading donors:', error)
+    });
   }
 
   private loadGifts() {
     this.giftService.getGifts().subscribe({
       next: (gifts) => this.gifts.set(gifts || []),
-      error: (error) => console.error('Error loading gifts:', error)
+      error: (error) => {
+        console.error('Error loading gifts:', error);
+        this.error.set('שגיאה בטעינת המתנות');
+      }
     });
   }
 
@@ -45,15 +57,12 @@ export class GiftManagementComponent {
     this.error.set('');
     const f = this.form();
     
-    if (!f.id || !f.name || !f.donorName || (f.ticketPrice === undefined || f.ticketPrice === null)) {
+    if (!f.name || !f.donorName || (f.ticketPrice === undefined || f.ticketPrice === null)) {
       this.error.set('כל השדות הינם חובה.');
       return;
     }
 
-    const gifts = [...this.gifts()];
-    const idx = gifts.findIndex(g => g.id === f.id || g.name === f.name);
-    const gift: Gift = { 
-      id: Number(f.id), 
+    const giftData: any = { 
       name: String(f.name), 
       donorName: String(f.donorName), 
       ticketPrice: Number(f.ticketPrice),
@@ -61,20 +70,44 @@ export class GiftManagementComponent {
       description: f.description || ''
     };
 
-    if (idx >= 0) {
-      gifts[idx] = gift;
-    } else {
-      gifts.push(gift);
-    }
+    console.log('Sending gift data:', giftData);
 
-    this.gifts.set(gifts);
-    this.cancel();
+    if (f.id) {
+      giftData.id = f.id;
+      this.giftService.updateGift(giftData).subscribe({
+        next: () => {
+          this.loadGifts();
+          this.cancel();
+        },
+        error: (err) => {
+          console.error('Error updating gift:', err);
+          this.error.set('שגיאה בעדכון המתנה');
+        }
+      });
+    } else {
+      this.giftService.addGift(giftData).subscribe({
+        next: () => {
+          this.loadGifts();
+          this.cancel();
+        },
+        error: (err) => {
+          console.error('Error adding gift:', err);
+          this.error.set('שגיאה בהוספת המתנה');
+        }
+      });
+    }
   }
 
   delete(g: Gift) {
-    this.gifts.set(this.gifts().filter(x => x !== g));
-    const f = this.form();
-    if (f.id === g.id && f.name === g.name) this.cancel();
+    if (!g.id || !confirm('האם למחוק את המתנה?')) return;
+    
+    this.giftService.deleteGift(g.id).subscribe({
+      next: () => {
+        this.loadGifts();
+        this.cancel();
+      },
+      error: (err) => this.error.set('שגיאה במחיקת המתנה')
+    });
   }
 
   cancel() {

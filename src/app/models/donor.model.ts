@@ -6,5 +6,4 @@ export interface Donor {
   email: string;
   address: string;
   gifts?: Gift[];
- IsDeleted?: boolean;
 }

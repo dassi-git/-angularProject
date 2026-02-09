@@ -42,7 +42,8 @@ export class MyOrdersComponent implements OnInit {
       userId = 1;
     }
 
-    this.orderService.getUserOrders(userId).subscribe({
+    // קריאה ל-Endpoint ההיסטוריה של הזמנות
+    this.orderService.getUserOrderHistory(userId).subscribe({
       next: (orders) => {
         this.orders = orders || [];
         this.isLoading = false;

@@ -68,8 +68,20 @@ export class AuthService {
     } else {
       // פרסור הטוקן לקבלת פרטי המשתמש
       const payload = this.parseJwtPayload(authResponse.token);
+      console.log('JWT Payload:', payload);
+      
+      const userIdStr = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] 
+        || payload.sub 
+        || payload.nameid 
+        || payload.userId 
+        || payload.id;
+      
+      const userId = userIdStr ? parseInt(userIdStr) : undefined;
+      console.log('Parsed userId:', userId);
+      
       const user: User = {
-        name: payload.name || 'User',
+        id: userId,
+        name: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload.name || payload.unique_name || 'User',
         email: payload.email || payload.sub || 'user@example.com',
         phone: '',
         password: '',

@@ -7,9 +7,11 @@ import { DonorListComponent } from './components/donor/donor';
 import { NavbarComponent } from './components/navbar/navbar';
 import { Home} from './home/home';
 import { CatalogComponent } from './catalog/catalog';
+import { ToastComponent } from './components/toast/toast.component';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, CommonModule,GiftList,DonorListComponent,NavbarComponent,Home],
+  imports: [RouterOutlet, RouterLink, CommonModule,GiftList,DonorListComponent,NavbarComponent,Home,ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -1,7 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../services/Admin';
-import { Gift } from '../../models/gift.model'; // ודאי שהנתיב נכון ל-Interface שלך
+import { GiftService } from '../../services/gift.service';
+import { Gift } from '../../models/gift.model';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-raffle-manage',
@@ -11,52 +13,70 @@ import { Gift } from '../../models/gift.model'; // ודאי שהנתיב נכו�
   styleUrl: './raffle-manage.scss'
 })
 export class RaffleManage implements OnInit {
-  // הזרקת השירות
   private adminService = inject(AdminService);
+  private giftService = inject(GiftService);
+  private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
-  // משתנים לניהול הנתונים והתצוגה
   gifts: Gift[] = [];
   isLoading = false;
+  showConfirmDialog = false;
+  selectedGiftId: number | null = null;
 
   ngOnInit(): void {
     this.loadGifts();
   }
 
-  // טעינת רשימת המתנות מהשרת
   loadGifts(): void {
-    this.adminService.getGifts().subscribe({
+    this.isLoading = true;
+    this.giftService.getGifts().subscribe({
       next: (data) => {
-        this.gifts = data;
+        this.gifts = data || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('שגיאה בטעינת מתנות:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // פונקציה לביצוע ההגרלה
   conductRaffle(giftId: number): void {
-    // 1. הפעלת מצב טעינה (נועל את הכפתור ב-HTML)
+    this.selectedGiftId = giftId;
+    this.showConfirmDialog = true;
+  }
+
+  confirmRaffle(): void {
+    if (!this.selectedGiftId) return;
+    
+    this.showConfirmDialog = false;
     this.isLoading = true;
 
-    this.adminService.conductRaffle(giftId).subscribe({
+    this.adminService.conductRaffle(this.selectedGiftId).subscribe({
       next: (result) => {
-        // השרת אמור להחזיר את פרטי הזוכה
-        alert(`ההגרלה הסתיימה! הזוכה במתנה הוא: ${result.winnerName}`);
-        
-        // 2. כיבוי מצב טעינה
+        if (result.winner) {
+          const winnerName = result.winner.winnerName || result.winner.winnerEmail || `משתמש #${result.winner.userId}`;
+          const giftName = result.winner.giftName || `מתנה #${result.winner.giftId}`;
+          this.toastService.success(`מזל טוב! הזוכה במתנה "${giftName}" הוא: ${winnerName}`, 5000);
+        } else {
+          this.toastService.warning('אין קונים למתנה זו. לא ניתן לבצע הגרלה.');
+        }
         this.isLoading = false;
-        
-        // 3. רענון הרשימה כדי לעדכן אם המתנה כבר הוגרלה
         this.loadGifts();
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('שגיאה בביצוע ההגרלה:', err);
-        alert('קרתה שגיאה בביצוע ההגרלה. נסה שוב מאוחר יותר.');
-        
-        // כיבוי מצב טעינה גם במקרה של שגיאה
+        const errorMsg = err.error?.error || err.error?.message || 'קרתה שגיאה בביצוע ההגרלה';
+        this.toastService.error(errorMsg);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  cancelRaffle(): void {
+    this.showConfirmDialog = false;
+    this.selectedGiftId = null;
   }
 }

@@ -6,34 +6,32 @@ import { GiftList } from './gift-list/gift-list';
 import { GiftManagementComponent } from './components/gift-management/gift-management.component';
 import { MyOrdersComponent } from './components/my-orders/my-orders.component';
 import { AuthGuard } from './services';
+import { AdminGuard } from './services/admin.guard';
 import { DonorListComponent } from './components/donor/donor';
 import { RaffleManage } from './components/raffle-manage/raffle-manage';
 import { ReportDashboard } from './components/report-dashboard/report-dashboard';
+import { PurchasesReportComponent } from './components/purchases-report/purchases-report.component';
 import { Home } from './home/home';
 import { CatalogComponent } from './catalog/catalog';
+import { Cart } from './components/cart/cart';
 
-
-/**
- * הגדרות נתיבי האפליקציה
- * מגדיר אילו רכיבים יוצגו באילו נתיבים
- */
 export const routes: Routes = [
-    { path: '',component:Home, pathMatch: 'full'}, // דף הבית - פתוח לכולם
-  { path: 'login', component: Login }, // דף כניסה - פתוח לכולם
-  { path: 'register', component: Register }, // דף הרשמה - פתוח לכולם
-  { path: 'catalog',  component:CatalogComponent }, // רשימת מתנות - פתוח לכולם
-  // { path: 'my-orders', component: MyOrdersComponent, canActivate: [AuthGuard] }, // ההזמנות שלי - דורש אימות
-  // { path: '', redirectTo: '', pathMatch: 'full' }, // נתיב ברירת מחדל - הפניה לרשימת 
+  { path: '', component: Home, pathMatch: 'full' },
+  { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: 'catalog', component: CatalogComponent },
+  { path: 'cart', component: Cart, canActivate: [AuthGuard] },
   { 
     path: 'admin', 
     component: AdminDashboard, 
-     canActivate: [AuthGuard],
+    canActivate: [AdminGuard],
     children: [
-      { path: 'donors', component: DonorListComponent }, // /admin/donors
-      {path: 'raffles',component:RaffleManage},
-      {path:'reports',component:ReportDashboard},
-      { path: 'manage-gifts', component: GiftManagementComponent  } // /admin/manage-gifts
+      { path: 'donors', component: DonorListComponent },
+      { path: 'manage-gifts', component: GiftManagementComponent },
+      { path: 'raffles', component: RaffleManage },
+      { path: 'reports', component: ReportDashboard },
+      { path: 'purchases', component: PurchasesReportComponent }
     ]
   },
-{ path: '**', redirectTo: '' }// נתיב ברירת מחדל למקרים של נתיב לא מוכר
+  { path: '**', redirectTo: '' }
 ];

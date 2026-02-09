@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../services/Admin'; // השתמשי בסרביס המאוחד שלך
+import { AdminService } from '../../services/Admin';
 import { Donor } from '../../models/donor.model';
 
 @Component({
@@ -12,41 +12,59 @@ import { Donor } from '../../models/donor.model';
 })
 export class DonorListComponent implements OnInit {
   private adminService = inject(AdminService);
+  private cdr = inject(ChangeDetectorRef);
 
-  // משתנים לניהול המדינה (State)
   donors: Donor[] = [];
   isLoading = false;
-
-  // אובייקט זמני להוספה
   newDonor: Donor = this.getEmptyDonor();
-
-  // אובייקט זמני לעריכה (כאן הפתרון לשגיאה הקודמת!)
   editingDonor: Donor | null = null;
 
   ngOnInit() {
     this.loadDonors();
   }
 
-  // טעינת רשימה
   loadDonors() {
     this.isLoading = true;
     this.adminService.getDonors().subscribe({
       next: (data) => {
         this.donors = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  // הוספת תורם
   addDonor() {
     if (!this.newDonor.name || !this.newDonor.email) return;
     
-    this.adminService.addDonor(this.newDonor).subscribe(() => {
-      alert('התורם נוסף בהצלחה!');
-      this.newDonor = this.getEmptyDonor();
-      this.loadDonors(); // רענון הרשימה מהשרת
+    console.log('Current user:', this.adminService);
+    console.log('Token:', localStorage.getItem('auth_token'));
+    
+    const donorToAdd: any = {
+      name: this.newDonor.name.trim(),
+      email: this.newDonor.email.trim(),
+      address: this.newDonor.address?.trim() || ''
+    };
+    
+    console.log('Sending donor:', donorToAdd);
+    
+    this.adminService.addDonor(donorToAdd).subscribe({
+      next: () => {
+        alert('התורם נוסף בהצלחה!');
+        this.newDonor = this.getEmptyDonor();
+        this.loadDonors();
+      },
+      error: (err) => {
+        console.error('Error adding donor:', err);
+        console.error('Error details:', err.error);
+        console.error('Validation errors:', err.error?.errors);
+        const errorMsg = err.error?.errors ? JSON.stringify(err.error.errors) : 'שגיאה בהוספת התורם';
+        alert(errorMsg);
+      }
     });
   }
 
@@ -61,13 +79,25 @@ export class DonorListComponent implements OnInit {
     this.editingDonor = null;
   }
 
-  // עדכון תורם
   updateDonor() {
     if (this.editingDonor && this.editingDonor.id) {
-      this.adminService.updateDonor(this.editingDonor).subscribe(() => {
-        alert('הנתונים עודכנו!');
-        this.editingDonor = null;
-        this.loadDonors();
+      const donorToUpdate = {
+        id: this.editingDonor.id,
+        name: this.editingDonor.name,
+        email: this.editingDonor.email,
+        address: this.editingDonor.address,
+        gifts: []
+      };
+      this.adminService.updateDonor(donorToUpdate).subscribe({
+        next: () => {
+          alert('הנתונים עודכנו!');
+          this.editingDonor = null;
+          this.loadDonors();
+        },
+        error: (err) => {
+          console.error('Error updating donor:', err);
+          alert('שגיאה בעדכון התורם');
+        }
       });
     }
   }
@@ -84,6 +114,6 @@ export class DonorListComponent implements OnInit {
 
   // פונקציית עזר לאיפוס אובייקט
   private getEmptyDonor(): Donor {
-    return { name: '', email: '', address: '', IsDeleted: false };
+    return { name: '', email: '', address: '' };
   }
 }

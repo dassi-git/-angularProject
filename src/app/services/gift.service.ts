@@ -20,7 +20,6 @@ export class GiftService {
    * מחזיר את כל המתנות
    */
   getGifts(): Observable<Gift[]> {
-    console.log('GiftService.getGifts() called, URL:', this.apiUrl);
     return this.http.get<Gift[]>(this.apiUrl);
   }
 
@@ -47,21 +46,21 @@ export class GiftService {
   /**
    * מוסיף מתנה חדשה
    */
-  addGift(gift: Omit<Gift, 'id'>): Observable<Gift> {
-    return this.http.post<Gift>(this.apiUrl, gift);
+  addGift(gift: Omit<Gift, 'id'>): Observable<any> {
+    return this.http.post(this.apiUrl, gift, { responseType: 'text' });
   }
 
   /**
    * מעדכן מתנה קיימת
    */
-  updateGift(gift: Gift): Observable<Gift> {
-    return this.http.put<Gift>(`${this.apiUrl}/${gift.id}`, gift);
+  updateGift(gift: Gift): Observable<any> {
+    return this.http.put(`${this.apiUrl}`, gift, { responseType: 'text' });
   }
 
   /**
    * מוחק מתנה
    */
-  deleteGift(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteGift(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 }

@@ -1,0 +1,371 @@
+// דוגמה של קבצי SCSS - רגיל
+.container-fluid {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px !important;
+}
+
+h1 {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #007bff;
+  padding-bottom: 15px;
+}
+
+h2 {
+  color: #34495e;
+  font-weight: 600;
+  margin-top: 30px;
+}
+
+// כרטיסי סטטיסטיקה
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.revenue-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  .card-title {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  h2 {
+    color: white;
+    margin: 10px 0;
+    font-size: 32px;
+  }
+
+  .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 12px;
+  }
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .card-title {
+    color: #2c3e50;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  h2 {
+    color: #2c3e50;
+    margin: 10px 0;
+    font-size: 32px;
+  }
+
+  .text-muted {
+    color: #7f8c8d;
+    font-size: 12px;
+  }
+}
+
+// טבלה
+.table-responsive {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.table {
+  margin-bottom: 0;
+  font-size: 14px;
+
+  thead {
+    background-color: #2c3e50;
+    color: white;
+
+    th {
+      font-weight: 600;
+      padding: 15px;
+      text-align: center;
+      border: none;
+      
+      &:first-child {
+        text-align: right;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #ecf0f1;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 15px;
+        text-align: center;
+        vertical-align: middle;
+        
+        &:first-child {
+          text-align: right;
+          font-weight: 600;
+          color: #007bff;
+        }
+
+        &:nth-child(6),
+        &:nth-child(7) {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+// Badges
+.badge {
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 20px;
+  display: inline-block;
+
+  &.bg-info {
+    background-color: #3498db !important;
+  }
+
+  &.bg-success {
+    background-color: #27ae60 !important;
+  }
+
+  &.bg-primary {
+    background-color: #2980b9 !important;
+  }
+
+  &.bg-secondary {
+    background-color: #95a5a6 !important;
+  }
+}
+
+// Alert
+.alert {
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+
+  &.alert-danger {
+    background-color: #ffe5e5;
+    color: #c0392b;
+    border-left: 5px solid #e74c3c;
+  }
+
+  &.alert-info {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-left: 5px solid #2196f3;
+  }
+
+  h5 {
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+// סגנון טעינה
+.loading-spinner {
+  text-align: center;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+
+  p {
+    color: #7f8c8d;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+}
+
+.spinner {
+  border: 5px solid #ecf0f1;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// כפתורים
+.btn {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.btn-close {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 10px !important;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-top: 20px;
+  }
+
+  .revenue-card h2,
+  .stats-card h2 {
+    font-size: 24px;
+  }
+
+  .table {
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 10px 5px;
+    }
+  }
+
+  .badge {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .row > div {
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-fluid {
+    padding: 5px !important;
+  }
+
+  h1 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .card {
+    margin-bottom: 15px;
+  }
+
+  .table {
+    font-size: 11px;
+
+    thead th {
+      padding: 10px 3px;
+      font-size: 11px;
+    }
+
+    tbody td {
+      padding: 8px 3px;
+    }
+  }
+
+  .revenue-card h2,
+  .stats-card h2 {
+    font-size: 20px;
+  }
+}
+
+// טקסט עברי - RTL
+[dir="rtl"] {
+  .table {
+    direction: rtl;
+
+    thead th,
+    tbody td {
+      text-align: right;
+
+      &:first-child {
+        text-align: left;
+      }
+    }
+  }
+
+  .badge {
+    margin-right: 5px;
+  }
+
+  .alert {
+    border-left: none;
+    border-right: 5px solid;
+  }
+}
+
+// פרטים בחצי גבוה
+small {
+  color: #7f8c8d;
+  font-size: 12px;
+
+  &.text-muted {
+    color: #95a5a6;
+  }
+}
+
+// עיצוב שורה בעומק
+tr {
+  &:nth-child(even) {
+    background-color: #fafafa;
+  }
+}
+
+// אנימציה עדינה
+* {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

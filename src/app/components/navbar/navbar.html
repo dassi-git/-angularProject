@@ -1,22 +1,15 @@
-<p>navbar works!</p>
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-  <div class="container">
-    <a class="navbar-brand" routerLink="/">מכירה סינית</a>
-
-    
-     <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" routerLink="/">מתנות</a>
 
     <div class="navbar-nav">
-      <a class="nav-link" routerLink="/">קטלוג</a>
+      <a class="nav-link" routerLink="/catalog">קטלוג</a>
 
       @if (authService.isAdmin()) {
-        <a class="nav-link text-danger" routerLink="/donors">ניהול תורמים</a>
-        <a class="nav-link text-danger" routerLink="/admin-gifts">עריכת מתנות</a>
+        <a class="nav-link text-danger" routerLink="/admin">ניהול</a>
       }
 
-      @if (authService. isAuthenticated() && !authService.isAdmin()) {
+      @if (authService.isAuthenticated() && !authService.isAdmin()) {
         <a class="nav-link" routerLink="/cart">הסל שלי 🛒</a>
       }
     </div>
@@ -30,9 +23,5 @@
         <a class="btn btn-outline-primary btn-sm" routerLink="/register">הרשמה</a>
       }
     </div>
-  </div>
-</nav>
-
-
   </div>
 </nav>

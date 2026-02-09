@@ -1,35 +1,59 @@
-<p>raffle-manage works!</p>
- 
-    <div class="card">
-      <div class="card-header">
-        <h5>ניהול הגרלות</h5>
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5>ניהול הגרלות</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">טוען...</span>
+        </div>
       </div>
-      <div class="card-body">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>מתנה</th>
-              <th>תורם</th>
-              <th>מחיר כרטיס</th>
-              <th>פעולות</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let gift of gifts">
-              <td>{{ gift.name }}</td>
-              <td>{{ gift.donorName }}</td>
-              <td>₪{{ gift.ticketPrice }}</td>
-              <td>
-                <button 
-                  class="btn btn-success btn-sm"
-                  (click)="conductRaffle(gift.id)"
-                  [disabled]="isLoading">
-                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                  בצע הגרלה
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      
+      <table *ngIf="!isLoading" class="table table-striped">
+        <thead>
+          <tr>
+            <th>מתנה</th>
+            <th>תורם</th>
+            <th>מחיר כרטיס</th>
+            <th>כרטיסים שנמכרו</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let gift of gifts">
+            <td>{{ gift.name }}</td>
+            <td>{{ gift.donorName }}</td>
+            <td>₪{{ gift.ticketPrice }}</td>
+            <td>{{ gift.ticketsSold || 0 }}</td>
+            <td>
+              <button 
+                *ngIf="gift.ticketsSold && gift.ticketsSold > 0 && !gift.hasWinner"
+                class="btn btn-success btn-sm"
+                (click)="conductRaffle(gift.id!)">
+                בצע הגרלה
+              </button>
+              <span *ngIf="gift.hasWinner" class="badge bg-info">הוגרלה</span>
+              <span *ngIf="!gift.ticketsSold || gift.ticketsSold === 0" class="badge bg-secondary">אין קונים</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div *ngIf="!isLoading && gifts.length === 0" class="text-center text-muted">
+        אין מתנות להציג
       </div>
     </div>
+  </div>
+
+  <div *ngIf="showConfirmDialog" class="modal-overlay" (click)="cancelRaffle()">
+    <div class="confirm-dialog" (click)="$event.stopPropagation()">
+      <h5>אישור הגרלה</h5>
+      <p>האם אתה בטוח שברצונך לבצע הגרלה? פעולה זו לא ניתנת לביטול.</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-success" (click)="confirmRaffle()">אישור</button>
+        <button class="btn btn-secondary" (click)="cancelRaffle()">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>

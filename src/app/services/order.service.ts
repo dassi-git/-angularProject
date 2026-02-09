@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Order, OrderItem, Gift, CreateOrderRequest } from '../models';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -15,6 +16,8 @@ export class OrderService {
   private apiUrl = environment.apiUrl;
   private cartSubject = new BehaviorSubject<OrderItem[]>([]);
   public cart$ = this.cartSubject.asObservable();
+
+  private currentDraftOrderId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -38,31 +41,26 @@ export class OrderService {
    * משתמש ב-checkout endpoint עם IsDraft = true
    */
   addToCartAsync(giftId: number, quantity: number = 1): Observable<any> {
-    console.log('פונקציית addToCartAsync נקראת');
-    
     const currentUser = this.authService.getCurrentUser();
-    console.log('משתמש נוכחי:', currentUser);
+    console.log('Current user in addToCartAsync:', currentUser);
     
     if (!currentUser) {
-      const errorMsg = 'משתמש לא מחובר';
-      console.error(errorMsg);
-      throw new Error(errorMsg);
+      throw new Error('משתמש לא מחובר');
     }
 
-    // חילוץ UserId
-    let userId: number = 1;
-    
-    if (currentUser.id) {
-      userId = currentUser.id;
-    } else if (currentUser.email && !isNaN(parseInt(currentUser.email))) {
-      userId = parseInt(currentUser.email);
+    const userId: number = currentUser.id !== undefined ? currentUser.id : 1;
+    console.log('Using userId:', userId);
+
+    // אם יש הזמנת טיוטה קיימת, נוסיף לה פריט
+    if (this.currentDraftOrderId) {
+      return this.addItemToExistingOrder(this.currentDraftOrderId, giftId, quantity);
     }
 
-    // יצירת הזמנה עם IsDraft = true (סל קניות)
+    // אחרת, ניצור הזמנה חדשה
     const orderRequest = {
       userId: userId,
-      totalAmount: 0, // יחושב בשרת
-      isDraft: true, // טיוטה - סל קניות
+      totalAmount: 0.01,
+      isDraft: true,
       orderItems: [
         {
           giftId: giftId,
@@ -71,10 +69,21 @@ export class OrderService {
       ]
     };
 
-    console.log('שליחת בקשה ל-checkout:', orderRequest);
-    console.log('URL:', `${this.apiUrl}/Order/checkout`);
-    
-    return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest);
+    return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
+      tap((response: any) => {
+        if (response.orderId) {
+          this.currentDraftOrderId = response.orderId;
+          localStorage.setItem('currentDraftOrderId', response.orderId.toString());
+        }
+      })
+    );
+  }
+
+  addItemToExistingOrder(orderId: number, giftId: number, quantity: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/Order/${orderId}/add-item`, {
+      giftId: giftId,
+      quantity: quantity
+    }, { responseType: 'text' });
   }
 
   // סל קניות (טיוטה) - פונקציות מקומיות
@@ -111,6 +120,8 @@ export class OrderService {
 
   clearCart(): void {
     this.updateCart([]);
+    this.currentDraftOrderId = null;
+    localStorage.removeItem('currentDraftOrderId');
   }
 
   /**
@@ -132,6 +143,12 @@ export class OrderService {
     if (!currentUser) {
       this.cartSubject.next([]);
       return;
+    }
+    
+    // טעינת מזהה ההזמנה הנוכחית
+    const savedOrderId = localStorage.getItem('currentDraftOrderId');
+    if (savedOrderId) {
+      this.currentDraftOrderId = parseInt(savedOrderId);
     }
     
     const userId = currentUser.id || currentUser.email;
@@ -161,7 +178,28 @@ export class OrderService {
     return this.http.get<any[]>(`${this.apiUrl}/Order/user/${userId}`);
   }
 
-  confirmOrder(userId: number): Observable<any> {
+  /// <summary>קריאה ל-Endpoint ההיסטוריה של הזמנות משתמש</summary>
+  getUserOrderHistory(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Order/user/history/${userId}`);
+  }
+
+  getAllOrders(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Order/all`);
+  }
+
+  confirmOrder(userId: number, totalAmount: number): Observable<any> {
+    // אם יש הזמנת טיוטה קיימת, נאשר אותה
+    if (this.currentDraftOrderId) {
+      return this.confirmOrderById(this.currentDraftOrderId).pipe(
+        tap(() => {
+          this.currentDraftOrderId = null;
+          localStorage.removeItem('currentDraftOrderId');
+          this.clearCart();
+        })
+      );
+    }
+    
+    // אחרת, ניצור הזמנה חדשה מאושרת
     const cart = this.getCart();
     
     if (cart.length === 0) {
@@ -170,16 +208,20 @@ export class OrderService {
     
     const orderRequest = {
       userId: userId,
-      totalAmount: 0, // יחושב בשרת
-      isDraft: false, // הזמנה סופית
+      totalAmount: totalAmount,
+      isDraft: false,
       orderItems: cart.map(item => ({
         giftId: item.giftId,
         quantity: item.quantity
       }))
     };
 
-    console.log('שליחת בקשת אישור רכישה:', orderRequest);
-    
-    return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest);
+    return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
+      tap(() => this.clearCart())
+    );
+  }
+
+  confirmOrderById(orderId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/Order/confirm/${orderId}`, {}, { responseType: 'text' });
   }
 }

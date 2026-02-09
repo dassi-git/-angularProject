@@ -1,0 +1,61 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5>דוח רכישות מפורט</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">טוען...</span>
+        </div>
+      </div>
+      
+      <table *ngIf="!isLoading && purchases.length > 0" class="table table-striped">
+        <thead>
+          <tr>
+            <th>מספר הזמנה</th>
+            <th>סטטוס</th>
+            <th>שם קונה</th>
+            <th>אימייל</th>
+            <th>תאריך רכישה</th>
+            <th>מתנות שנרכשו</th>
+            <th>כמות כרטיסים</th>
+            <th>סכום כולל</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let purchase of purchases">
+            <td>{{ purchase.id }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="!purchase.isDraft" [class.bg-warning]="purchase.isDraft">
+                {{ purchase.isDraft ? 'טיוטה' : 'מאושר' }}
+              </span>
+            </td>
+            <td>{{ purchase.userName || 'לא ידוע' }}</td>
+            <td>{{ purchase.userEmail || '-' }}</td>
+            <td>{{ purchase.orderDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <ul class="list-unstyled mb-0">
+                <li *ngFor="let item of purchase.orderItems">
+                  {{ item.giftName || 'מתנה #' + item.giftId }}
+                </li>
+              </ul>
+            </td>
+            <td>
+              <ul class="list-unstyled mb-0">
+                <li *ngFor="let item of purchase.orderItems">
+                  {{ item.quantity }}
+                </li>
+              </ul>
+            </td>
+            <td><strong>₪{{ purchase.totalAmount | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div *ngIf="!isLoading && purchases.length === 0" class="text-center text-muted">
+        <p>אין רכישות מאושרות להציג</p>
+      </div>
+    </div>
+  </div>
+</div>

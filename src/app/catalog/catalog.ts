@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { GiftService } from '../services/gift.service';
 import { OrderService } from '../services/order.service';
 import { AuthService } from '../services/auth.service';
@@ -21,7 +21,7 @@ export class CatalogComponent implements OnInit {
   isManager = false;
   isLoggedIn = false;
 
-  cartCount = 0;            // ✅ נדרש ל־HTML
+  cartCount = 0;
   showAddForm = false;
 
   newGift: any = {
@@ -36,36 +36,47 @@ export class CatalogComponent implements OnInit {
     private giftService: GiftService,
     private orderService: OrderService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-
-    // טעינת מתנות
     this.loadGifts();
 
-    // בדיקת משתמש מחובר
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn = !!user;
       this.isManager = user?.role === 'Manager';
+      this.cdr.markForCheck();
     });
 
-    // מונה פריטים בסל
     this.orderService.cart$.subscribe(items => {
       this.cartCount = items.reduce(
         (sum, item) => sum + item.quantity,
         0
       );
+      this.cdr.markForCheck();
     });
   }
 
   loadGifts() {
-    this.giftService.getGifts().subscribe(g => {
-      this.gifts = g.map(gift => ({
-        ...gift,
-        quantity: 1   // כמות ברירת מחדל
-      }));
+    this.giftService.getGifts().subscribe({
+      next: (g) => {
+        console.log('Gifts received:', g);
+        this.gifts = g.map(gift => ({
+          ...gift,
+          quantity: 1
+        }));
+        console.log('Gifts array after mapping:', this.gifts);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading gifts:', err);
+      }
     });
+  }
+
+  hasWinner(gift: any): boolean {
+    return !!gift.winner || !!gift.winnerName || !!gift.winnerId;
   }
 
   toggleAddForm() {
@@ -95,16 +106,24 @@ export class CatalogComponent implements OnInit {
     this.giftService.deleteGift(id).subscribe(() => this.loadGifts());
   }
 
-  // ✅ הוספה לסל – רק אם מחובר
   addToCart(gift: any) {
     if (!this.isLoggedIn) return;
 
     this.orderService.addToCartAsync(gift.id, gift.quantity || 1)
-      .subscribe();
+      .subscribe({
+        next: (response) => {
+          alert(`המתנה "${gift.name}" נוספה לסל!`);
+          this.orderService.addToCart(gift.id, gift.quantity || 1, gift);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error adding to cart:', err);
+          alert('שגיאה בהוספה לסל');
+        }
+      });
   }
 
-  // ✅ נדרש ל־HTML
   openBasket() {
-    this.router.navigate(['/basket']);
+    this.router.navigate(['/cart']);
   }
 }

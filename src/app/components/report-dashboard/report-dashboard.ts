@@ -1,54 +1,66 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminService } from "../../services/Admin" ; // הנתיב לסרביס שלך
+import { AdminService } from "../../services/Admin";
 
 @Component({
   selector: 'app-report-dashboard',
   standalone: true,
-  imports: [CommonModule], // מאפשר שימוש ב-pipes ובדירקטיבות בסיסיות
+  imports: [CommonModule],
   templateUrl: './report-dashboard.html',
   styleUrls: ['./report-dashboard.scss']
 })
 export class ReportDashboard implements OnInit {
-  // 1. הזרקת השירות (Service)
   private adminService = inject(AdminService);
+  private cdr = inject(ChangeDetectorRef);
 
-  // 2. הגדרת מבנה הנתונים (עם ערכי ברירת מחדל)
   revenueReport = {
     totalRevenue: 0,
     totalOrders: 0,
-    totalTickets: 0
+    totalTicketsSold: 0
   };
 
-  winners: any[] = [];
+  giftsWithWinners: any[] = [];
   isLoading: boolean = false;
+  errorMessage: string = '';
 
   ngOnInit(): void {
-    // ברגע שהקומפוננטה עולה - נטען את הנתונים
     this.loadData();
   }
 
   loadData(): void {
     this.isLoading = true;
+    this.errorMessage = '';
 
-    // קריאה לשירות לקבלת דוח הכנסות
     this.adminService.getRevenueReport().subscribe({
       next: (data) => {
         this.revenueReport = data;
-      },
-      error: (err) => console.error('שגיאה בטעינת דוחות:', err)
-    });
-
-    // קריאה לשירות לקבלת רשימת הזוכים
-    this.adminService.getWinners().subscribe({
-      next: (data) => {
-        this.winners = data;
-        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('שגיאה בטעינת זוכים:', err);
-        this.isLoading = false;
+        this.errorMessage = 'שגיאה בטעינת דוח ההכנסות';
+        this.cdr.detectChanges();
       }
     });
+
+    this.adminService.getGiftsWithWinners().subscribe({
+      next: (data) => {
+        this.giftsWithWinners = data || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage = 'שגיאה בטעינת רשימת המתנות';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // פונקציה לחישוב סכום כולל של הכנסות עבור מתנה
+  getTotalRevenue(gift: any): number {
+    if (!gift.orderItems) return 0;
+    return gift.orderItems.reduce((sum: number, item: any) => {
+      return sum + (item.quantity * item.unitPrice);
+    }, 0);
   }
 }

@@ -131,7 +131,7 @@ export class Cart implements OnInit, OnDestroy {
     
     console.log('מאשר רכישה עבור משתמש:', userId);
     
-    this.orderService.confirmOrder(userId).subscribe({
+    this.orderService.confirmOrder(userId, this.totalAmount).subscribe({
       next: (response) => {
         console.log('רכישה אושרה:', response);
         this.orderService.clearCart();
@@ -142,6 +142,7 @@ export class Cart implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('שגיאה באישור רכישה:', error);
+        console.error('Error details:', error.error);
         this.isLoading = false;
         
         let errorMessage = 'שגיאה באישור הרכישה';

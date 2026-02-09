@@ -24,3 +24,47 @@
 input[type="number"] {
   max-width: 80px;
 }
+
+@media (max-width: 767px) {
+  .card {
+    margin: 10px;
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 4px;
+  }
+
+  input[type="number"] {
+    max-width: 60px;
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 6px 2px;
+  }
+
+  input[type="number"] {
+    max-width: 50px;
+  }
+}

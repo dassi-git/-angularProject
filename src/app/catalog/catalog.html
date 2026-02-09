@@ -21,11 +21,24 @@
   <!-- GRID -->
   <main class="gift-grid">
 
+    <!-- Debug info -->
+    <div *ngIf="gifts.length === 0" style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fff3cd; border-radius: 10px;">
+      <h3>⚠️ לא נמצאו מתנות</h3>
+      <p>מספר מתנות במערך: {{ gifts.length }}</p>
+      <p>בודק חיבור לשרת...</p>
+    </div>
+
     <div class="gift-card" *ngFor="let gift of gifts">
 
       <div class="image-container">
-        <img [src]="gift.imageUrl || 'https://via.placeholder.com/300x200'">
+        <img [src]="gift.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22%23999%22%3E' + gift.name + '%3C/text%3E%3C/svg%3E'" 
+             [alt]="gift.name">
         <div class="price-badge">{{ gift.ticketPrice }} ₪</div>
+        
+        <!-- תווית ההגרלה הסתיימה -->
+        <div *ngIf="hasWinner(gift)" class="winner-badge">
+          ✓ ההגרלה הסתיימה
+        </div>
       </div>
 
       <div class="card-content">
@@ -35,20 +48,31 @@
         <!-- משתמש מחובר -->
         <div *ngIf="isLoggedIn" class="card-footer">
 
-          <div class="quantity-box">
-            <label>כמות:</label>
-            <input
-              type="number"
-              min="1"
-              [(ngModel)]="gift.quantity"
-              name="qty{{gift.id}}">
+          <!-- אם ההגרלה הסתיימה -->
+          <div *ngIf="hasWinner(gift)" class="disabled-notice">
+            <span class="badge-completed">✓ הגרלה הושלמה</span>
+            <button class="btn btn-outline-primary" disabled>
+              🛒 הוסף לסל
+            </button>
           </div>
 
-          <button
-            class="btn btn-outline-primary"
-            (click)="addToCart(gift)">
-            🛒 הוסף לסל
-          </button>
+          <!-- אם ההגרלה פעילה -->
+          <div *ngIf="!hasWinner(gift)" class="quantity-and-button">
+            <div class="quantity-box">
+              <label>כמות:</label>
+              <input
+                type="number"
+                min="1"
+                [(ngModel)]="gift.quantity"
+                name="qty{{gift.id}}">
+            </div>
+
+            <button
+              class="btn btn-outline-primary"
+              (click)="addToCart(gift)">
+              🛒 הוסף לסל
+            </button>
+          </div>
 
         </div>
 

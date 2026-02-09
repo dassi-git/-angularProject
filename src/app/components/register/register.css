@@ -32,3 +32,35 @@ a:hover {
   color: #20c997;
   text-decoration: underline;
 }
+
+@media (max-width: 767px) {
+  .card {
+    margin: 10px;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card {
+    margin: 5px;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+}

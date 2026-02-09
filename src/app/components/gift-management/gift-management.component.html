@@ -14,35 +14,31 @@
       <form>
         <div class="row">
           <div class="col-md-6">
-            <label class="form-label">מספר מתנה:</label>
-            <input type="number" class="form-control" [(ngModel)]="form().id" name="id">
-          </div>
-          <div class="col-md-6">
             <label class="form-label">שם המתנה:</label>
             <input type="text" class="form-control" [(ngModel)]="form().name" name="name">
           </div>
-        </div>
-        
-        <div class="row mt-3">
           <div class="col-md-6">
             <label class="form-label">תורם:</label>
             <select class="form-control" [(ngModel)]="form().donorName" name="donorName">
               <option value="">בחר תורם</option>
-              <option *ngFor="let donor of donors" [value]="donor">{{ donor }}</option>
+              <option *ngFor="let donor of donors()" [value]="donor.name">{{ donor.name }}</option>
             </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">עלות כרטיס:</label>
-            <input type="number" class="form-control" [(ngModel)]="form().ticketPrice" name="ticketPrice">
           </div>
         </div>
         
         <div class="row mt-3">
           <div class="col-md-6">
+            <label class="form-label">עלות כרטיס:</label>
+            <input type="number" class="form-control" [(ngModel)]="form().ticketPrice" name="ticketPrice">
+          </div>
+          <div class="col-md-6">
             <label class="form-label">קטגוריה:</label>
             <input type="text" class="form-control" [(ngModel)]="form().category" name="category">
           </div>
-          <div class="col-md-6">
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-md-12">
             <label class="form-label">תיאור:</label>
             <input type="text" class="form-control" [(ngModel)]="form().description" name="description">
           </div>
