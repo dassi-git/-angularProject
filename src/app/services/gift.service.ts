@@ -52,6 +52,9 @@ export class GiftService {
    * מוסיף מתנה חדשה
    */
   addGift(gift: Omit<Gift, 'id'>): Observable<any> {
+    if(gift.name){
+      gift.name = gift.name.trim();
+    }
     return this.http.post(this.apiUrl, gift, { responseType: 'text' });
   }
 

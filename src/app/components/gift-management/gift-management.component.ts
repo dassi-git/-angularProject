@@ -63,7 +63,7 @@ export class GiftManagementComponent {
     }
 
     const giftData: any = { 
-      name: String(f.name), 
+      name: String(f.name).trim(), 
       donorName: String(f.donorName), 
       ticketPrice: Number(f.ticketPrice),
       category: f.category || '',
@@ -81,8 +81,10 @@ export class GiftManagementComponent {
         },
         error: (err) => {
           console.error('Error updating gift:', err);
-          this.error.set('שגיאה בעדכון המתנה');
-        }
+          const errorMsg = err.status === 400 ? err.error : 'שגיאה בעדכון המתנה';
+        this.error.set(errorMsg);
+      }
+         
       });
     } else {
       this.giftService.addGift(giftData).subscribe({
@@ -92,7 +94,30 @@ export class GiftManagementComponent {
         },
         error: (err) => {
           console.error('Error adding gift:', err);
-          this.error.set('שגיאה בהוספת המתנה');
+
+         let message = 'שגיאה בהוספת המתנה';
+
+    // בדיקה אם השגיאה היא מסוג Conflict (409) או BadRequest (400)
+    if (err.status === 409 || err.status === 400) {
+      try {
+        // מנסים להפוך את הטקסט לאובייקט JSON
+        const errorBody = typeof err.error === 'string' ? JSON.parse(err.error) : err.error;
+        // לוקחים את שדה ה-message שהראית לי קודם
+        message = errorBody.message || message;
+      } catch (e) {
+        // אם זה לא JSON, פשוט ניקח את הטקסט כמו שהוא
+        message = err.error || message;
+      }
+    }
+
+    // הצגת השגיאה ב-Signal
+    this.error.set(message);
+
+    // בונוס: העלמת השגיאה אוטומטית אחרי 5 שניות כדי שהמסך יישאר נקי
+    setTimeout(() => {
+      this.error.set('');
+    }, 5000);
+  
         }
       });
     }
