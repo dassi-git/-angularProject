@@ -6,9 +6,6 @@ import { Order, OrderItem, Gift, CreateOrderRequest } from '../models';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-/**
- * שירות לניהול הזמנות וסל קניות
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -21,28 +18,21 @@ export class OrderService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService // לקבלת פרטי המשתמש המחובר
+    private authService: AuthService
   ) {
     this.loadCartFromStorage();
     
-    // ניקוי הסל כשמשתמש מתנתק
     this.authService.currentUser$.subscribe(user => {
       if (!user) {
         this.clearCart();
       } else {
-        // טעינת סל ספציפי למשתמש
         this.loadUserCart(user.id || user.email);
       }
     });
   }
 
-  /**
-   * מוסיף מתנה לסל הקניות דרך ה-API
-   * משתמש ב-checkout endpoint עם IsDraft = true
-   */
   addToCartAsync(giftId: number, quantity: number = 1): Observable<any> {
     const currentUser = this.authService.getCurrentUser();
-
     
     if (!currentUser || !currentUser.id || currentUser.id === 0) {
       throw new Error('אנא התחבר מחדש כדי להוסיף מוצרים לסל');
@@ -50,13 +40,10 @@ export class OrderService {
 
     const userId: number = currentUser.id;
 
-
-    // אם יש הזמנת טיוטה קיימת, נוסיף לה פריט
     if (this.currentDraftOrderId) {
       return this.addItemToExistingOrder(this.currentDraftOrderId, giftId, quantity);
     }
 
-    // אחרת, ניצור הזמנה חדשה
     const orderRequest = {
       TotalAmount: 0.01,
       IsDraft: true,
@@ -67,8 +54,6 @@ export class OrderService {
         }
       ]
     };
-
-
 
     return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
       tap((response: any) => {
@@ -87,14 +72,10 @@ export class OrderService {
     }, { responseType: 'text' });
   }
 
-  // סל קניות (טיוטה) - פונקציות מקומיות
   getCart(): OrderItem[] {
     return this.cartSubject.value;
   }
 
-  /**
-   * מוסיף פריט לסל המקומי עם נתוני המתנה
-   */
   addToCart(giftId: number, quantity: number = 1, giftData?: Gift): void {
     const cart = this.getCart();
     const existingItem = cart.find(item => item.giftId === giftId);
@@ -103,7 +84,6 @@ export class OrderService {
       existingItem.quantity += quantity;
     } else {
       const newItem: any = { giftId, quantity };
-      // שמירת נתוני המתנה אם סופקו
       if (giftData) {
         newItem.giftData = giftData;
       }
@@ -111,7 +91,6 @@ export class OrderService {
     }
     
     this.updateCart(cart);
-
   }
 
   removeFromCart(giftId: number): void {
@@ -125,11 +104,7 @@ export class OrderService {
     localStorage.removeItem('currentDraftOrderId');
   }
 
-  /**
-   * מעדכן את הסל ומעדכן את כל המקשיבים
-   */
   private updateCart(cart: OrderItem[]): void {
-
     this.cartSubject.next(cart);
     
     const currentUser = this.authService.getCurrentUser();
@@ -146,7 +121,6 @@ export class OrderService {
       return;
     }
     
-    // טעינת מזהה ההזמנה הנוכחית
     const savedOrderId = localStorage.getItem('currentDraftOrderId');
     if (savedOrderId) {
       this.currentDraftOrderId = parseInt(savedOrderId);
@@ -179,7 +153,6 @@ export class OrderService {
     return this.http.get<any[]>(`${this.apiUrl}/Order/user/${userId}`);
   }
 
-  /// <summary>קריאה ל-Endpoint ההיסטוריה של הזמנות משתמש</summary>
   getUserOrderHistory(userId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/Order/user/history/${userId}`);
   }
@@ -189,7 +162,6 @@ export class OrderService {
   }
 
   confirmOrder(userId: number, totalAmount: number): Observable<any> {
-    // אם יש הזמנת טיוטה קיימת, נאשר אותה
     if (this.currentDraftOrderId) {
       return this.confirmOrderById(this.currentDraftOrderId).pipe(
         tap(() => {
@@ -200,7 +172,6 @@ export class OrderService {
       );
     }
     
-    // אחרת, ניצור הזמנה חדשה מאושרת
     const cart = this.getCart();
     
     if (cart.length === 0) {

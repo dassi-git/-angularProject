@@ -4,21 +4,14 @@ import { Observable } from 'rxjs';
 import { Gift } from '../models';
 import { environment } from '../../environments/environment';
 
-/**
- * שירות לניהול מתנות
- * מספק פונקציות CRUD למתנות וחיפוש
- */
 @Injectable({
-  providedIn: 'root' // זמין בכל האפליקציה
+  providedIn: 'root'
 })
 export class GiftService {
-  private apiUrl = `${environment.apiUrl}/Gift`; // כתובת ה-API למתנות
+  private apiUrl = `${environment.apiUrl}/Gift`;
 
-  constructor(private http: HttpClient) {} // הזרקת HTTP client
+  constructor(private http: HttpClient) {}
 
-  /**
-   * מחזיר את כל המתנות עם סינונים
-   */
   getGifts(name?: string, donorName?: string, minPurchasers?: number | null): Observable<Gift[]> {
     let params = new HttpParams();
     if (name) params = params.set('name', name);
@@ -28,16 +21,10 @@ export class GiftService {
     return this.http.get<Gift[]>(this.apiUrl, { params });
   }
 
-  /**
-   * מחזיר מתנה ספציפית לפי ID
-   */
   getGiftById(id: number): Observable<Gift> {
     return this.http.get<Gift>(`${this.apiUrl}/${id}`);
   }
 
-  /**
-   * מחפש מתנות לפי קריטריונים שונים
-   */
   searchGifts(name?: string, donor?: string, minPrice?: number, maxPrice?: number): Observable<Gift[]> {
     let params = new HttpParams();
     if (name) params = params.set('name', name);
@@ -48,23 +35,14 @@ export class GiftService {
     return this.http.get<Gift[]>(`${this.apiUrl}/search`, { params });
   }
 
-  /**
-   * מוסיף מתנה חדשה
-   */
   addGift(gift: Omit<Gift, 'id'>): Observable<any> {
     return this.http.post(this.apiUrl, gift, { responseType: 'text' });
   }
 
-  /**
-   * מעדכן מתנה קיימת
-   */
   updateGift(gift: Gift): Observable<any> {
     return this.http.put(`${this.apiUrl}`, gift, { responseType: 'text' });
   }
 
-  /**
-   * מוחק מתנה
-   */
   deleteGift(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }

@@ -67,24 +67,16 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, authResponse.token);
     
     if (authResponse.user) {
-
       localStorage.setItem(this.userKey, JSON.stringify(authResponse.user));
       this.currentUserSubject.next(authResponse.user);
     } else {
-
-      // פרסור הטוקן לקבלת פרטי המשתמש
       const payload = this.parseJwtPayload(authResponse.token);
-
-      
       const userIdStr = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] 
         || payload.sub 
         || payload.nameid 
         || payload.userId 
         || payload.id;
-      
       const userId = userIdStr ? parseInt(userIdStr) : undefined;
-
-      
       const user: User = {
         id: userId,
         name: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload.name || payload.unique_name || 'User',
@@ -121,7 +113,6 @@ export class AuthService {
         const user = JSON.parse(userJson);
         this.currentUserSubject.next(user);
       } catch (error) {
-        // אם יש שגיאה בפרסור, נמחק את הנתונים הפגומים
         localStorage.removeItem(this.tokenKey);
         localStorage.removeItem(this.userKey);
       }

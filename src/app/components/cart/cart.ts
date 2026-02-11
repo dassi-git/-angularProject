@@ -11,10 +11,6 @@ interface CartItemWithGift {
   total: number;
 }
 
-/**
- * רכיב סל קניות
- * מציג את המתנות בסל ומאפשר ניהול
- */
 @Component({
   selector: 'app-cart',
   imports: [CommonModule],
@@ -45,16 +41,9 @@ export class Cart implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * טוען את פריטי הסל מהשרת
-   */
   loadCartItems(): void {
-
-    
     const cart = this.orderService.getCart();
-
     
-    // אם אין פריטים בסל
     if (cart.length === 0) {
       this.cartItems = [];
       this.totalAmount = 0;
@@ -63,9 +52,7 @@ export class Cart implements OnInit, OnDestroy {
       return;
     }
 
-    // יצירת פריטים עם נתונים אמיתיים אם קיימים
     this.cartItems = cart.map(orderItem => {
-      // אם יש נתוני מתנה שמורים, השתמש בהם
       const gift = (orderItem as any).giftData || {
         id: orderItem.giftId,
         name: `מתנה #${orderItem.giftId}`,
@@ -87,11 +74,7 @@ export class Cart implements OnInit, OnDestroy {
 
   }
 
-  /**
-   * מסיר פריט מהסל עם אישור
-   */
   removeFromCart(giftId: number): void {
-    // אישור מחיקה
     const giftName = this.cartItems.find(item => item.gift.id === giftId)?.gift.name || 'מתנה';
     const confirmed = confirm(`האם אתה בטוח שברצונך להסיר את "${giftName}" מהסל?`);
     
@@ -119,24 +102,18 @@ export class Cart implements OnInit, OnDestroy {
       this.toastService.warning('עליך להתחבר כדי לבצע רכישה');
       return;
     }
-
-    this.isLoading = true;
     
-    // חילוץ userId אמיתי
     let userId: number;
     if (user.id) {
       userId = user.id;
     } else if (user.email && !isNaN(parseInt(user.email))) {
       userId = parseInt(user.email);
     } else {
-      userId = 1; // ברירת מחדל
+      userId = 1;
     }
-    
-
     
     this.orderService.confirmOrder(userId, this.totalAmount).subscribe({
       next: (response) => {
-
         this.orderService.clearCart();
         this.toastService.success('הרכישה אושרה בהצלחה!');
         setTimeout(() => {

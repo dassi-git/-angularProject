@@ -4,10 +4,6 @@ import { Observable } from 'rxjs';
 import { Winner } from '../models';
 import { environment } from '../../environments/environment';
 
-
-
-
-
 @Injectable({
   providedIn: 'root'
 })
