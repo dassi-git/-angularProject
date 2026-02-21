@@ -58,7 +58,7 @@ export class CatalogComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn = !!user;
       this.isManager = user?.role === 'Manager';
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     });
 
     this.orderService.cart$.subscribe(items => {
