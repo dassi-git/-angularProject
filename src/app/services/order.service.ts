@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { Order, OrderItem, Gift, CreateOrderRequest } from '../models';
+import { Order, OrderItem, Gift } from '../models';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -10,16 +10,18 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = environment.apiUrl;
-  private cartSubject = new BehaviorSubject<OrderItem[]>([]);
-  public cart$ = this.cartSubject.asObservable();
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+  private readonly apiUrl = environment.apiUrl;
+  private readonly cartSubject = new BehaviorSubject<OrderItem[]>([]);
+  readonly cart$ = this.cartSubject.asObservable();
+  private readonly cartSignal = signal<OrderItem[]>([]);
+  readonly cart = computed(() => this.cartSignal());
+  readonly cartCount = computed(() => this.cartSignal().reduce((sum, item) => sum + item.quantity, 0));
 
   private currentDraftOrderId: number | null = null;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {
+  constructor() {
     this.loadCartFromStorage();
     
     this.authService.currentUser$.subscribe(user => {
@@ -32,7 +34,7 @@ export class OrderService {
     });
   }
 
-  addToCartAsync(giftId: number, quantity: number = 1): Observable<any> {
+  addToCartAsync(giftId: number, quantity: number = 1): Observable<unknown> {
     const currentUser = this.authService.getCurrentUser();
     
     if (!currentUser) {
@@ -55,7 +57,7 @@ export class OrderService {
     return this.createDraftOrder(giftId, quantity);
   }
 
-  private createDraftOrder(giftId: number, quantity: number): Observable<any> {
+  private createDraftOrder(giftId: number, quantity: number): Observable<unknown> {
 
     const orderRequest = {
       TotalAmount: 0.01,
@@ -69,15 +71,15 @@ export class OrderService {
     };
 
     return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
-      tap((response: any) => {
-        if (response.orderId) {
+      tap((response: { orderId?: number } | null) => {
+        if (response?.orderId) {
           this.setDraftOrderId(response.orderId);
         }
       })
     );
   }
 
-  addItemToExistingOrder(orderId: number, giftId: number, quantity: number): Observable<any> {
+  addItemToExistingOrder(orderId: number, giftId: number, quantity: number): Observable<string> {
     return this.http.post(`${this.apiUrl}/Order/${orderId}/add-item`, {
       GiftId: giftId,
       Quantity: quantity
@@ -85,7 +87,7 @@ export class OrderService {
   }
 
   getCart(): OrderItem[] {
-    return this.cartSubject.value;
+    return this.cartSignal();
   }
 
   addToCart(giftId: number, quantity: number = 1, giftData?: Gift): void {
@@ -95,9 +97,9 @@ export class OrderService {
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      const newItem: any = { giftId, quantity };
+      const newItem: OrderItem = { giftId, quantity };
       if (giftData) {
-        newItem.giftData = giftData;
+        (newItem as OrderItem & { giftData?: Gift }).giftData = giftData;
       }
       cart.push(newItem);
     }
@@ -116,7 +118,7 @@ export class OrderService {
   }
 
   private updateCart(cart: OrderItem[]): void {
-    this.cartSubject.next(cart);
+    this.setCartState(cart);
     
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
@@ -128,7 +130,7 @@ export class OrderService {
   private loadCartFromStorage(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
-      this.cartSubject.next([]);
+      this.setCartState([]);
       return;
     }
 
@@ -137,39 +139,39 @@ export class OrderService {
     const userId = currentUser.id || currentUser.email;
     const saved = localStorage.getItem(`cart_${userId}`);
     if (saved) {
-      this.cartSubject.next(JSON.parse(saved));
+      this.setCartState(this.parseStoredCart(saved));
     } else {
-      this.cartSubject.next([]);
+      this.setCartState([]);
     }
   }
 
-  private loadUserCart(userId: any): void {
+  private loadUserCart(userId: string | number): void {
     const saved = localStorage.getItem(`cart_${userId}`);
     if (saved) {
-      this.cartSubject.next(JSON.parse(saved));
+      this.setCartState(this.parseStoredCart(saved));
     } else {
-      this.cartSubject.next([]);
+      this.setCartState([]);
     }
   }
 
   // הזמנות
-  createOrder(order: Order): Observable<any> {
-    return this.http.post(`${this.apiUrl}/Order`, order);
+  createOrder(order: Order): Observable<unknown> {
+    return this.http.post<unknown>(`${this.apiUrl}/Order`, order);
   }
 
-  getUserOrders(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/Order/user/${userId}`);
+  getUserOrders(userId: number): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/Order/user/${userId}`);
   }
 
-  getUserOrderHistory(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/Order/user/history/${userId}`);
+  getUserOrderHistory(userId: number): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/Order/user/history/${userId}`);
   }
 
-  getAllOrders(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/Order/all`);
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/Order/all`);
   }
 
-  confirmOrder(userId: number, totalAmount: number): Observable<any> {
+  confirmOrder(_userId: number, totalAmount: number): Observable<unknown> {
     if (this.currentDraftOrderId) {
       return this.confirmOrderById(this.currentDraftOrderId).pipe(
         tap(() => {
@@ -182,7 +184,7 @@ export class OrderService {
     const cart = this.getCart();
     
     if (cart.length === 0) {
-      throw new Error('הסל ריק');
+      return throwError(() => new Error('הסל ריק'));
     }
     
     const orderRequest = {
@@ -248,12 +250,15 @@ export class OrderService {
     localStorage.removeItem('currentDraftOrderId');
   }
 
-  private shouldRecreateDraftOrder(err: any): boolean {
+  private shouldRecreateDraftOrder(err: { status?: number; error?: unknown }): boolean {
     const status = err?.status;
     const payload = err?.error;
+    const payloadMessage = payload && typeof payload === 'object' && 'message' in payload
+      ? String((payload as { message?: unknown }).message ?? '')
+      : '';
     const message = typeof payload === 'string'
       ? payload.toLowerCase()
-      : (payload?.message ?? '').toLowerCase();
+      : payloadMessage.toLowerCase();
 
     const raffleIndicators = ['הוגרל', 'זוכה', 'winner', 'raffl'];
     if (raffleIndicators.some((token) => message.includes(token))) {
@@ -262,5 +267,20 @@ export class OrderService {
 
     const draftIndicators = ['draft', 'order', 'not found', 'confirm', 'closed', 'expired'];
     return status === 404 || status === 410 || (status === 400 && draftIndicators.some((token) => message.includes(token)));
+  }
+
+  private parseStoredCart(rawCart: string): OrderItem[] {
+    try {
+      const parsed = JSON.parse(rawCart);
+      return Array.isArray(parsed) ? parsed as OrderItem[] : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private setCartState(cart: OrderItem[]): void {
+    const normalized = [...cart];
+    this.cartSignal.set(normalized);
+    this.cartSubject.next(normalized);
   }
 }

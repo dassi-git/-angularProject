@@ -1,14 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// הגדרת ממשקים (Interfaces) כדי שהקוד יהיה קריא ובטוח
-export interface Donor {
-  id?: number;
-  name: string;
-  email: string;
-  address: string;
-}
+import { Donor, Gift, Winner } from '../models';
+import { environment } from '../../environments/environment';
 
 export interface RevenueReport {
   totalRevenue: number;
@@ -20,11 +14,8 @@ export interface RevenueReport {
   providedIn: 'root'
 })
 export class AdminService {
-  // 1. הזרקת ה-HttpClient
-  private http = inject(HttpClient);
-
-  // 2. כתובת ה-API (שני אותה לכתובת השרת האמיתית שלך)
-  private apiUrl = 'http://localhost:5226/api';
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
 
   constructor() { }
 
@@ -46,16 +37,16 @@ export class AdminService {
     return this.http.delete<void>(`${this.apiUrl}/Donor/${id}`);
   }
 
-  getGifts(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/Gift`);
+  getGifts(): Observable<Gift[]> {
+    return this.http.get<Gift[]>(`${this.apiUrl}/Gift`);
   }
 
   conductRaffle(giftId: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/Raffle/run/${giftId}`, {});
   }
 
-  getWinners(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/Winner`);
+  getWinners(): Observable<Winner[]> {
+    return this.http.get<Winner[]>(`${this.apiUrl}/Winner`);
   }
 
   getRevenueReport(): Observable<RevenueReport> {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
@@ -10,10 +10,10 @@ import { AuthService } from './auth.service';
   providedIn: 'root' // זמין בכל האפליקציה
 })
 export class AuthGuard implements CanActivate {
-  constructor(
-    private authService: AuthService, // שירות אימות
-    private router: Router // ניווט בין עמודים
-  ) {}
+  private readonly authService = inject(AuthService); // שירות אימות
+  private readonly router = inject(Router); // ניווט בין עמודים
+
+  constructor() {}
 
   /**
    * בודק אם ניתן לגשת לנתיב

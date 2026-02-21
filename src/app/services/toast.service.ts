@@ -11,26 +11,26 @@ export interface Toast {
   providedIn: 'root'
 })
 export class ToastService {
-  private toastSubject = new Subject<Toast>();
-  toast$ = this.toastSubject.asObservable();
+  private readonly toastSubject = new Subject<Toast>();
+  readonly toast$ = this.toastSubject.asObservable();
 
-  show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration = 3000) {
+  show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration = 3000): void {
     this.toastSubject.next({ message, type, duration });
   }
 
-  success(message: string, duration = 3000) {
+  success(message: string, duration = 3000): void {
     this.show(message, 'success', duration);
   }
 
-  error(message: string, duration = 4000) {
+  error(message: string, duration = 4000): void {
     this.show(message, 'error', duration);
   }
 
-  info(message: string, duration = 3000) {
+  info(message: string, duration = 3000): void {
     this.show(message, 'info', duration);
   }
 
-  warning(message: string, duration = 3000) {
+  warning(message: string, duration = 3000): void {
     this.show(message, 'warning', duration);
   }
 
