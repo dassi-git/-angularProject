@@ -70,8 +70,6 @@ export class GiftManagementComponent {
       description: f.description || ''
     };
 
-
-
     if (f.id) {
       giftData.id = f.id;
       this.giftService.updateGift(giftData).subscribe({

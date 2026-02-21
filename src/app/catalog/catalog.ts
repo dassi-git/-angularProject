@@ -21,7 +21,6 @@ export class CatalogComponent implements OnInit {
   categories: any[] = [];
   donors: any[] = [];
 
-  // סינונים
   searchName: string = '';
   searchDonor: string = '';
   searchCategory: string = '';
@@ -87,13 +86,11 @@ export class CatalogComponent implements OnInit {
   loadGifts() {
     this.giftService.getGifts(this.searchName, this.searchDonor, this.minPurchasers).subscribe({
       next: (g) => {
-        console.log('Gifts received:', g);
         this.gifts = g.map(gift => ({
           ...gift,
           quantity: 1
         }));
         this.filteredGifts = this.gifts;
-        console.log('Gifts array after mapping:', this.gifts);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -137,7 +134,6 @@ export class CatalogComponent implements OnInit {
   }
 
   onEdit(gift: any) {
-    // future: edit route
   }
 
   onDelete(id: number) {
