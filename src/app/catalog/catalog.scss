@@ -31,7 +31,7 @@ $transition-speed: 0.3s;
     .subtitle { color: #777; margin-top: 5px; }
   }
 
-  // אזור טופס הניהול (למנהל בלבד)
+  // Add Gift Form
   .add-gift-form {
     background: white;
     border-right: 5px solid $primary-color;
@@ -41,23 +41,92 @@ $transition-speed: 0.3s;
     box-shadow: $card-shadow;
     animation: slideIn 0.4s ease-out;
 
-    h3 { color: $primary-color; margin-top: 0; }
+    h3 {
+      color: $primary-color;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
+    .form-group {
       margin-bottom: 20px;
 
-      input, select, textarea {
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .form-control {
+        width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 8px;
         font-size: 1rem;
-        &:focus { border-color: $primary-color; outline: none; }
+        transition: border-color $transition-speed;
+
+        &:focus {
+          border-color: $primary-color;
+          outline: none;
+          box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+        }
       }
-      textarea { grid-column: span 1; height: 48px; }
+
+      textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .error-message {
+        color: $danger-color;
+        font-size: 0.875rem;
+        margin-top: 5px;
+      }
     }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all $transition-speed;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .btn-primary {
+        background: $primary-color;
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: darken($primary-color, 10%);
+        }
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+
+        &:hover {
+          background: darken(#6c757d, 10%);
+        }
+      }
+    }
+  }
+
+  .add-gift-section {
+    text-align: center;
+    margin-bottom: 20px;
   }
 
   // גריד המתנות
