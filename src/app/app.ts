@@ -1,17 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { GiftList } from './gift-list/gift-list';
-import { RouterOutlet, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from './services';
-import { DonorListComponent } from './components/donor/donor';
 import { NavbarComponent } from './components/navbar/navbar';
-import { Home} from './home/home';
-import { CatalogComponent } from './catalog/catalog';
 import { ToastComponent } from './components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, CommonModule,GiftList,DonorListComponent,NavbarComponent,Home,ToastComponent],
+  imports: [RouterOutlet, NavbarComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

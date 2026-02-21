@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Order, OrderItem, Gift, CreateOrderRequest } from '../models';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -26,6 +26,7 @@ export class OrderService {
       if (!user) {
         this.clearCart();
       } else {
+        this.loadDraftOrderIdFromStorage();
         this.loadUserCart(user.id || user.email);
       }
     });
@@ -34,15 +35,27 @@ export class OrderService {
   addToCartAsync(giftId: number, quantity: number = 1): Observable<any> {
     const currentUser = this.authService.getCurrentUser();
     
-    if (!currentUser || !currentUser.id || currentUser.id === 0) {
-      throw new Error('אנא התחבר מחדש כדי להוסיף מוצרים לסל');
+    if (!currentUser) {
+      return throwError(() => new Error('אנא התחבר מחדש כדי להוסיף מוצרים לסל'));
     }
-
-    const userId: number = currentUser.id;
 
     if (this.currentDraftOrderId) {
-      return this.addItemToExistingOrder(this.currentDraftOrderId, giftId, quantity);
+      return this.addItemToExistingOrder(this.currentDraftOrderId, giftId, quantity).pipe(
+        catchError((err) => {
+          if (!this.shouldRecreateDraftOrder(err)) {
+            return throwError(() => err);
+          }
+
+          this.clearDraftOrderId();
+          return this.createDraftOrder(giftId, quantity);
+        })
+      );
     }
+
+    return this.createDraftOrder(giftId, quantity);
+  }
+
+  private createDraftOrder(giftId: number, quantity: number): Observable<any> {
 
     const orderRequest = {
       TotalAmount: 0.01,
@@ -58,8 +71,7 @@ export class OrderService {
     return this.http.post(`${this.apiUrl}/Order/checkout`, orderRequest).pipe(
       tap((response: any) => {
         if (response.orderId) {
-          this.currentDraftOrderId = response.orderId;
-          localStorage.setItem('currentDraftOrderId', response.orderId.toString());
+          this.setDraftOrderId(response.orderId);
         }
       })
     );
@@ -100,8 +112,7 @@ export class OrderService {
 
   clearCart(): void {
     this.updateCart([]);
-    this.currentDraftOrderId = null;
-    localStorage.removeItem('currentDraftOrderId');
+    this.clearDraftOrderId();
   }
 
   private updateCart(cart: OrderItem[]): void {
@@ -120,11 +131,8 @@ export class OrderService {
       this.cartSubject.next([]);
       return;
     }
-    
-    const savedOrderId = localStorage.getItem('currentDraftOrderId');
-    if (savedOrderId) {
-      this.currentDraftOrderId = parseInt(savedOrderId);
-    }
+
+    this.loadDraftOrderIdFromStorage();
     
     const userId = currentUser.id || currentUser.email;
     const saved = localStorage.getItem(`cart_${userId}`);
@@ -165,8 +173,7 @@ export class OrderService {
     if (this.currentDraftOrderId) {
       return this.confirmOrderById(this.currentDraftOrderId).pipe(
         tap(() => {
-          this.currentDraftOrderId = null;
-          localStorage.removeItem('currentDraftOrderId');
+          this.clearDraftOrderId();
           this.clearCart();
         })
       );
@@ -194,5 +201,66 @@ export class OrderService {
 
   confirmOrderById(orderId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/Order/confirm/${orderId}`, {}, { responseType: 'text' });
+  }
+
+  private getDraftOrderStorageKey(): string | null {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      return null;
+    }
+
+    const userKey = currentUser.id || currentUser.email;
+    return `currentDraftOrderId_${userKey}`;
+  }
+
+  private loadDraftOrderIdFromStorage(): void {
+    const key = this.getDraftOrderStorageKey();
+    if (!key) {
+      this.currentDraftOrderId = null;
+      return;
+    }
+
+    const savedOrderId = localStorage.getItem(key);
+    if (!savedOrderId) {
+      this.currentDraftOrderId = null;
+      return;
+    }
+
+    const parsed = Number(savedOrderId);
+    this.currentDraftOrderId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  private setDraftOrderId(orderId: number): void {
+    this.currentDraftOrderId = orderId;
+    const key = this.getDraftOrderStorageKey();
+    if (key) {
+      localStorage.setItem(key, orderId.toString());
+    }
+  }
+
+  private clearDraftOrderId(): void {
+    const key = this.getDraftOrderStorageKey();
+    this.currentDraftOrderId = null;
+    if (key) {
+      localStorage.removeItem(key);
+    }
+
+    localStorage.removeItem('currentDraftOrderId');
+  }
+
+  private shouldRecreateDraftOrder(err: any): boolean {
+    const status = err?.status;
+    const payload = err?.error;
+    const message = typeof payload === 'string'
+      ? payload.toLowerCase()
+      : (payload?.message ?? '').toLowerCase();
+
+    const raffleIndicators = ['הוגרל', 'זוכה', 'winner', 'raffl'];
+    if (raffleIndicators.some((token) => message.includes(token))) {
+      return false;
+    }
+
+    const draftIndicators = ['draft', 'order', 'not found', 'confirm', 'closed', 'expired'];
+    return status === 404 || status === 410 || (status === 400 && draftIndicators.some((token) => message.includes(token)));
   }
 }

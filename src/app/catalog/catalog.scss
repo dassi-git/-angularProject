@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // משתני צבעים ותצורה
 $primary-color: #6200ee;
 $secondary-color: #03dac6;
@@ -109,7 +111,7 @@ $transition-speed: 0.3s;
         color: white;
 
         &:hover:not(:disabled) {
-          background: darken($primary-color, 10%);
+          background: color.adjust($primary-color, $lightness: -10%);
         }
       }
 
@@ -118,7 +120,7 @@ $transition-speed: 0.3s;
         color: white;
 
         &:hover {
-          background: darken(#6c757d, 10%);
+          background: color.adjust(#6c757d, $lightness: -10%);
         }
       }
     }
@@ -188,11 +190,6 @@ $transition-speed: 0.3s;
 
       h3 { margin: 0 0 10px 0; color: #2c3e50; }
       .description { color: #7f8c8d; font-size: 0.95rem; min-height: 45px; }
-      .donor-info { 
-        font-size: 0.85rem; 
-        color: #95a5a6;
-        span { color: $primary-color; font-weight: 600; }
-      }
     }
 
     // תחתית הכרטיס (כפתורים)
@@ -288,38 +285,9 @@ $transition-speed: 0.3s;
         }
       }
 
-      .btn-cart {
-        background: $success-color;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: bold;
-        &:hover { opacity: 0.9; }
-      }
-
-      .admin-quick-actions {
-        display: flex;
-        gap: 8px;
-        
-        .btn-icon {
-          background: #f1f1f1;
-          border: none;
-          padding: 8px;
-          border-radius: 8px;
-          cursor: pointer;
-          &:hover { background: #e0e0e0; }
-          &.btn-danger:hover { background: $danger-color; color: white; }
-        }
-      }
     }
   }
 }
-
-// כפתורים כלליים
-.btn-primary { background: $primary-color; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; }
-.btn-success { background: $success-color; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; width: 100%; }
 
 // אנימציות
 @keyframes slideIn {
@@ -330,7 +298,6 @@ $transition-speed: 0.3s;
 // התאמה לניידים
 @media (max-width: 600px) {
   .catalog-header { flex-direction: column; text-align: center; gap: 20px; }
-  .form-grid { grid-template-columns: 1fr !important; }
 }
 
 
@@ -390,7 +357,7 @@ $transition-speed: 0.3s;
         color: white;
 
         &:hover {
-          background: darken($primary-color, 10%);
+          background: color.adjust($primary-color, $lightness: -10%);
         }
       }
 
@@ -399,7 +366,7 @@ $transition-speed: 0.3s;
         color: white;
 
         &:hover {
-          background: darken(#6c757d, 10%);
+          background: color.adjust(#6c757d, $lightness: -10%);
         }
       }
     }

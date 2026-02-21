@@ -8,72 +8,84 @@
     </div>
 
     <!-- סל קניות – רק למשתמש מחובר -->
+    @if (isLoggedIn()) {
     <button
-      *ngIf="isLoggedIn()"
       class="btn btn-outline-dark cart-btn"
       (click)="openBasket()">
       🛒 סל ({{ cartCount() }})
     </button>
+    }
   </header>
 
   <hr class="separator">
 
   <!-- סינונים -->
-  <div class="filters-section">
+  <form class="filters-section" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
     <div class="filter-group">
       <label>חיפוש לפי שם:</label>
-      <input type="text" [ngModel]="searchName()" (ngModelChange)="searchName.set($event)" placeholder="שם המתנה">
+      <input type="text" formControlName="name" placeholder="שם המתנה">
     </div>
     <div class="filter-group">
       <label>תורם:</label>
-      <select [ngModel]="searchDonor()" (ngModelChange)="searchDonor.set($event)">
+      <select formControlName="donor">
         <option value="">כל התורמים</option>
-        <option *ngFor="let donor of donors()" [value]="donor">{{ donor }}</option>
+        @for (donor of donors(); track donor) {
+          <option [value]="donor">{{ donor }}</option>
+        }
       </select>
     </div>
     <div class="filter-group">
       <label>קטגוריה:</label>
-      <select [ngModel]="searchCategory()" (ngModelChange)="searchCategory.set($event)">
+      <select formControlName="category">
         <option value="">כל הקטגוריות</option>
-        <option *ngFor="let category of categories()" [value]="category">{{ category }}</option>
+        @for (category of categories(); track category) {
+          <option [value]="category">{{ category }}</option>
+        }
       </select>
     </div>
     <div class="filter-group">
       <label>מינימום רוכשים:</label>
-      <input type="number" [ngModel]="minPurchasers()" (ngModelChange)="minPurchasers.set($event || null)" placeholder="0">
+      <input type="number" appPositiveNumber [appPositiveNumberMin]="1" min="1" formControlName="minPurchasers" placeholder="0">
     </div>
     <div class="filter-actions">
-      <button class="btn btn-primary" (click)="applyFilters()">חפש</button>
-      <button class="btn btn-secondary" (click)="clearFilters()">נקה</button>
+      <button type="submit" class="btn btn-primary">חפש</button>
+      <button type="button" class="btn btn-secondary" (click)="clearFilters()">נקה</button>
     </div>
-  </div>
+  </form>
 
   <hr class="separator">
 
   <!-- Error Message -->
-  <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
-    {{ errorMessage() }}
-    <button type="button" class="btn-close" (click)="errorMessage.set(null)" aria-label="Close"></button>
-  </div>
+  @if (errorMessage()) {
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage() }}
+      <button type="button" class="btn-close" (click)="errorMessage.set(null)" aria-label="Close"></button>
+    </div>
+  }
 
   <!-- Add Gift Form -->
-  <div *ngIf="showAddForm()" class="add-gift-form">
+  @if (showAddForm()) {
+  <div class="add-gift-form">
     <h3>הוסף מתנה חדשה</h3>
     <form [formGroup]="addGiftForm" (ngSubmit)="onAddGift()">
       <div class="form-group">
         <label for="name">שם המתנה:</label>
         <input type="text" id="name" formControlName="name" class="form-control">
-        <div *ngIf="addGiftForm.get('name')?.invalid && addGiftForm.get('name')?.touched" class="error-message">
+        @if (addGiftForm.get('name')?.invalid && addGiftForm.get('name')?.touched) {
+        <div class="error-message">
           שם המתנה נדרש ומזערי 2 תווים
         </div>
+        }
       </div>
 
       <div class="form-group">
         <label for="ticketPrice">מחיר כרטיס:</label>
-        <input type="number" id="ticketPrice" formControlName="ticketPrice" class="form-control" min="1">
-        <div *ngIf="addGiftForm.get('ticketPrice')?.invalid && addGiftForm.get('ticketPrice')?.touched" class="error-message">
+        <input type="number" id="ticketPrice" appPositiveNumber [appPositiveNumberMin]="1" formControlName="ticketPrice" class="form-control" min="1">
+        @if (addGiftForm.get('ticketPrice')?.invalid && addGiftForm.get('ticketPrice')?.touched) {
+        <div class="error-message">
           מחיר חייב להיות גדול מ-0
         </div>
+        }
       </div>
 
       <div class="form-group">
@@ -92,13 +104,16 @@
       </div>
     </form>
   </div>
+  }
 
   <!-- Add Gift Button (for managers) -->
-  <div *ngIf="isManager()" class="add-gift-section">
+  @if (isManager()) {
+  <div class="add-gift-section">
     <button class="btn btn-success" (click)="toggleAddForm()">
       {{ showAddForm() ? 'סגור טופס' : '+ הוסף מתנה חדשה' }}
     </button>
   </div>
+  }
 
   <hr class="separator">
 
@@ -106,13 +121,16 @@
   <main class="gift-grid">
 
     <!-- Debug info -->
-    <div *ngIf="filteredGifts().length === 0" class="empty-state" style="grid-column: 1/-1;">
+    @if (filteredGifts().length === 0) {
+    <div class="empty-state" style="grid-column: 1/-1;">
       <div class="empty-state-icon">🎁</div>
-      <h3 class="empty-state-title">אין מתנות זמינות</h3>
+      <h3 class="empty-state-title">{{ hasActiveFilters() ? 'לא נמצאו מתנות' : 'אין מתנות זמינות' }}</h3>
       <p class="empty-state-description">כרגע אין מתנות זמינות לרכישה. חזור מאוחר יותר!</p>
     </div>
+    }
 
-    <div class="gift-card card-animate hover-lift" *ngFor="let gift of filteredGifts(); let i = index" [style.animation-delay]="(i * 0.1) + 's'">
+    @for (gift of filteredGifts(); track gift.id; let i = $index) {
+    <div class="gift-card card-animate hover-lift" [style.animation-delay]="(i * 0.1) + 's'">
 
       <div class="image-container">
         <img [src]="gift.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22%23999%22%3E' + gift.name + '%3C/text%3E%3C/svg%3E'" 
@@ -120,9 +138,11 @@
         <div class="price-badge">{{ gift.ticketPrice }} ₪</div>
         
         <!-- תווית ההגרלה הסתיימה -->
-        <div *ngIf="hasWinner(gift)" class="winner-badge">
+        @if (hasWinner(gift)) {
+        <div class="winner-badge">
           ✓ ההגרלה הסתיימה
         </div>
+        }
       </div>
 
       <div class="card-content">
@@ -130,25 +150,31 @@
         <p class="description">{{ gift.description }}</p>
 
         <!-- משתמש מחובר -->
-        <div *ngIf="isLoggedIn()" class="card-footer">
+        @if (isLoggedIn()) {
+        <div class="card-footer">
 
           <!-- אם ההגרלה הסתיימה -->
-          <div *ngIf="hasWinner(gift)" class="disabled-notice">
+          @if (hasWinner(gift)) {
+          <div class="disabled-notice">
             <span class="badge-completed">✓ הגרלה הושלמה</span>
             <button class="btn btn-outline-primary" disabled>
               🛒 הוסף לסל
             </button>
           </div>
+          }
 
           <!-- אם ההגרלה פעילה -->
-          <div *ngIf="!hasWinner(gift)" class="quantity-and-button">
+          @if (!hasWinner(gift)) {
+          <div class="quantity-and-button">
             <div class="quantity-box">
               <label>כמות:</label>
               <input
                 type="number"
+                appPositiveNumber
+                [appPositiveNumberMin]="1"
                 min="1"
-                [ngModel]="getQuantity(gift.id)"
-                (ngModelChange)="setQuantity(gift.id, $event)"
+                [value]="getQuantity(gift.id)"
+                (input)="onQuantityInput(gift.id, $any($event.target).value)"
                 name="qty{{gift.id}}">
             </div>
 
@@ -158,16 +184,21 @@
               🛒 הוסף לסל
             </button>
           </div>
+          }
 
         </div>
+        }
 
         <!-- משתמש לא מחובר -->
-        <div *ngIf="!isLoggedIn()" class="guest-msg">
+        @if (!isLoggedIn()) {
+        <div class="guest-msg">
           🔒 יש להתחבר כדי להשתתף בהגרלה
         </div>
+        }
 
       </div>
     </div>
+    }
 
   </main>
 </div>

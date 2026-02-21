@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { GiftService } from '../services/gift.service';
 import { OrderService } from '../services/order.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Gift } from '../models/gift.model';
-import { Subject, takeUntil, combineLatest } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { PositiveNumberDirective } from '../shared/directives/positive-number.directive';
 
 @Component({
   selector: 'app-catalog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PositiveNumberDirective],
   templateUrl: './catalog.html',
   styleUrls: ['./catalog.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,12 +33,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
   readonly categories = signal<string[]>([]);
   readonly donors = signal<string[]>([]);
 
-  // Filter signals
-  readonly searchName = signal('');
-  readonly searchDonor = signal('');
-  readonly searchCategory = signal('');
-  readonly minPurchasers = signal<number | null>(null);
-
   // Applied filter signals (for server-side filtering)
   readonly appliedSearchName = signal('');
   readonly appliedSearchDonor = signal('');
@@ -51,6 +45,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
   readonly cartCount = signal(0);
   readonly showAddForm = signal(false);
   readonly errorMessage = signal<string | null>(null);
+
+  readonly canBuyTickets = computed(() => this.isLoggedIn());
 
   // Quantity tracking for cart additions
   readonly quantities = signal<Record<number, number>>({});
@@ -68,6 +64,20 @@ export class CatalogComponent implements OnInit, OnDestroy {
     return filtered;
   });
 
+  readonly hasActiveFilters = computed(() => {
+    return !!this.appliedSearchName()
+      || !!this.appliedSearchDonor()
+      || !!this.appliedSearchCategory()
+      || this.appliedMinPurchasers() !== null;
+  });
+
+  readonly filterForm: FormGroup = this.fb.group({
+    name: [''],
+    donor: [''],
+    category: [''],
+    minPurchasers: [null]
+  });
+
   // Reactive form for adding gifts
   readonly addGiftForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -77,45 +87,14 @@ export class CatalogComponent implements OnInit, OnDestroy {
     description: ['']
   });
 
-  constructor() {
-    // Remove automatic effect - search will be manual
-  }
-
-  // Getters and setters for ngModel binding with signals
-  get searchNameValue(): string {
-    return this.searchName();
-  }
-
-  set searchNameValue(value: string) {
-    this.searchName.set(value);
-  }
-
-  get searchDonorValue(): string {
-    return this.searchDonor();
-  }
-
-  set searchDonorValue(value: string) {
-    this.searchDonor.set(value);
-  }
-
-  get searchCategoryValue(): string {
-    return this.searchCategory();
-  }
-
-  set searchCategoryValue(value: string) {
-    this.searchCategory.set(value);
-  }
-
-  get minPurchasersValue(): number | null {
-    return this.minPurchasers();
-  }
-
-  set minPurchasersValue(value: number | null) {
-    this.minPurchasers.set(value);
-  }
+  constructor() {}
 
   ngOnInit(): void {
     // Load initial data
+    this.appliedSearchName.set('');
+    this.appliedSearchDonor.set('');
+    this.appliedSearchCategory.set('');
+    this.appliedMinPurchasers.set(null);
     this.loadGifts(); // Load all gifts initially
     this.loadCategories();
     this.loadDonors();
@@ -162,16 +141,13 @@ export class CatalogComponent implements OnInit, OnDestroy {
   private loadGifts(): void {
     this.errorMessage.set(null); // Clear previous errors
     this.giftService.getGifts(
-      this.searchName() || undefined,
-      this.searchDonor() || undefined,
-      this.minPurchasers() || undefined
+      this.appliedSearchName() || undefined,
+      this.appliedSearchDonor() || undefined,
+      this.appliedMinPurchasers() || undefined
     ).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (gifts) => {
-          this.gifts.set(gifts.map(gift => ({
-            ...gift,
-            quantity: 1
-          })));
+          this.gifts.set(gifts);
           this.errorMessage.set(null); // Clear error on success
         },
         error: (err) => {
@@ -183,20 +159,30 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    // Apply all filters when search button is clicked
-    this.appliedSearchName.set(this.searchName());
-    this.appliedSearchDonor.set(this.searchDonor());
-    this.appliedSearchCategory.set(this.searchCategory());
-    this.appliedMinPurchasers.set(this.minPurchasers());
+    const rawFilters = this.filterForm.getRawValue();
+    const normalizedName = (rawFilters.name ?? '').trim();
+    const normalizedDonor = rawFilters.donor ?? '';
+    const normalizedCategory = rawFilters.category ?? '';
+    const parsedMin = rawFilters.minPurchasers !== null && rawFilters.minPurchasers !== ''
+      ? Number(rawFilters.minPurchasers)
+      : null;
+
+    this.appliedSearchName.set(normalizedName);
+    this.appliedSearchDonor.set(normalizedDonor);
+    this.appliedSearchCategory.set(normalizedCategory);
+    this.appliedMinPurchasers.set(Number.isFinite(parsedMin) && parsedMin !== null && parsedMin > 0 ? parsedMin : null);
+
     this.loadGifts();
   }
 
   clearFilters(): void {
-    // Clear both input and applied filter signals
-    this.searchName.set('');
-    this.searchDonor.set('');
-    this.searchCategory.set('');
-    this.minPurchasers.set(null);
+    this.filterForm.reset({
+      name: '',
+      donor: '',
+      category: '',
+      minPurchasers: null
+    });
+
     this.appliedSearchName.set('');
     this.appliedSearchDonor.set('');
     this.appliedSearchCategory.set('');
@@ -205,13 +191,24 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   hasWinner(gift: Gift): boolean {
-    return !!(gift as any).winner || !!(gift as any).winnerName || !!(gift as any).winnerId;
+    const candidate = gift as Gift & {
+      winner?: unknown;
+      winnerName?: string;
+      winnerId?: number;
+    };
+    return !!candidate.winner || !!candidate.winnerName || !!candidate.winnerId;
   }
 
   toggleAddForm(): void {
     this.showAddForm.set(!this.showAddForm());
     if (this.showAddForm()) {
-      this.addGiftForm.reset();
+      this.addGiftForm.reset({
+        name: '',
+        ticketPrice: 0,
+        imageUrl: '',
+        categoryId: null,
+        description: ''
+      });
     }
   }
 
@@ -264,7 +261,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   addToCart(gift: Gift): void {
-    if (!this.isLoggedIn()) {
+    if (!this.canBuyTickets()) {
       this.toastService.error('יש להתחבר כדי להוסיף מוצרים לסל');
       return;
     }
@@ -278,14 +275,37 @@ export class CatalogComponent implements OnInit, OnDestroy {
           this.toastService.success(`המתנה "${gift.name}" נוספה לסל!`);
           this.orderService.addToCart(gift.id, quantity, gift);
           this.errorMessage.set(null); // Clear any previous errors
+          this.openBasket();
         },
         error: (err) => {
           console.error('Error adding to cart:', err);
-          const errorMsg = err?.error?.message || 'שגיאה בהוספה לסל - ייתכן שהמתנה כבר הוגרלה';
+          const errorMsg = this.resolveAddToCartErrorMessage(err);
           this.errorMessage.set(errorMsg);
 
         }
       });
+  }
+
+  private resolveAddToCartErrorMessage(err: unknown): string {
+    const errorPayload = (err as { error?: unknown })?.error;
+
+    const rawMessage = typeof errorPayload === 'string'
+      ? errorPayload
+      : (errorPayload as { message?: string })?.message;
+
+    if (!rawMessage) {
+      return 'שגיאה בהוספה לסל. אנא נסה שוב.';
+    }
+
+    const normalized = rawMessage.toLowerCase();
+    const raffleIndicators = ['הוגרל', 'זוכה', 'winner', 'raffl'];
+    const isRaffleError = raffleIndicators.some(token => normalized.includes(token));
+
+    if (isRaffleError) {
+      return 'לא ניתן להוסיף לסל: המתנה כבר הוגרלה.';
+    }
+
+    return rawMessage;
   }
 
   getQuantity(giftId: number): number {
@@ -293,7 +313,13 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   setQuantity(giftId: number, quantity: number): void {
-    this.quantities.update(q => ({ ...q, [giftId]: quantity }));
+    const normalizedQuantity = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+    this.quantities.update(q => ({ ...q, [giftId]: normalizedQuantity }));
+  }
+
+  onQuantityInput(giftId: number, rawValue: string): void {
+    const parsedValue = Number(rawValue);
+    this.setQuantity(giftId, parsedValue);
   }
 
   openBasket(): void {
