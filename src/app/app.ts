@@ -9,6 +9,7 @@ import { ToastComponent } from './components/toast/toast.component';
   imports: [RouterOutlet, NavbarComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
+  standalone: true
 })
 export class App {
   protected readonly title = signal('מערכת ההגרלות');

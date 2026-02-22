@@ -4,32 +4,34 @@
 }
 
 .card-header {
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #e91e63, #c2185b);
   color: white;
   border-bottom: none;
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #e91e63, #c2185b);
   border: none;
+  color: white;
 }
 
 .btn-success:hover {
-  background: linear-gradient(135deg, #20c997, #17a2b8);
+  background: linear-gradient(135deg, #c2185b, #880e4f);
+  color: white;
 }
 
 .form-control:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  border-color: #e91e63;
+  box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25);
 }
 
 a {
-  color: #28a745;
+  color: #e91e63;
   text-decoration: none;
 }
 
 a:hover {
-  color: #20c997;
+  color: #c2185b;
   text-decoration: underline;
 }
 

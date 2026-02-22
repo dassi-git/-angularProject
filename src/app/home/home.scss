@@ -1,6 +1,9 @@
 .home-hero {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: calc(100vh - 160px);
+  background: linear-gradient(135deg, #e91e63 0%, #880e4f 100%);
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
 }
 
 .glass-card {
@@ -8,6 +11,7 @@
   backdrop-filter: blur(10px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2.5rem !important;
 }
 
 .badge-gold {
@@ -38,7 +42,7 @@
 
 .btn-primary-glass:hover {
   background: white;
-  color: #667eea;
+  color: #e91e63;
   transform: translateY(-2px);
 }
 
@@ -52,7 +56,7 @@
 
 .btn-outline-white:hover {
   background: white;
-  color: #667eea;
+  color: #e91e63;
   transform: translateY(-2px);
 }
 
@@ -99,22 +103,23 @@
 
 @media (max-width: 767px) {
   .home-hero {
-    padding: 20px 10px;
+    padding: 10px 5px;
+    min-height: calc(100vh - 100px);
   }
 
   .glass-card {
-    padding: 2rem !important;
+    padding: 1.5rem !important;
   }
 
   .main-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .subtitle {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .btn {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem;
   }
 }

@@ -9,7 +9,7 @@ h1 {
   color: #2c3e50;
   font-weight: 700;
   margin-bottom: 30px;
-  border-bottom: 3px solid #007bff;
+  border-bottom: 3px solid #e91e63;
   padding-bottom: 15px;
 }
 
@@ -34,7 +34,7 @@ h2 {
 }
 
 .revenue-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e91e63 0%, #880e4f 100%);
   color: white;
 
   .card-title {
@@ -128,7 +128,7 @@ h2 {
         &:first-child {
           text-align: right;
           font-weight: 600;
-          color: #007bff;
+          color: #e91e63;
         }
 
         &:nth-child(6),
@@ -212,7 +212,7 @@ h2 {
 
 .spinner {
   border: 5px solid #ecf0f1;
-  border-top: 5px solid #3498db;
+  border-top: 5px solid #e91e63;
   border-radius: 50%;
   width: 60px;
   height: 60px;

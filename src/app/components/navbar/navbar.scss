@@ -1,10 +1,20 @@
 .navbar {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  overflow: visible;
 }
 
 .navbar-brand {
   font-weight: 600;
   font-size: 1.25rem;
+  overflow: visible;
+  padding: 0.25rem 0;
+
+  img {
+    display: block;
+    max-height: 120px;
+    width: auto;
+    object-fit: contain;
+  }
 }
 
 .navbar-nav {

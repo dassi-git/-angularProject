@@ -4,9 +4,9 @@
 }
 
 .nav-tabs .nav-link.active {
-  color: #007bff;
+  color: #e91e63;
   background-color: #fff;
-  border-color: #dee2e6 #dee2e6 #fff;
+  border-color: #f8bbd0 #f8bbd0 #fff;
 }
 
 .card {
