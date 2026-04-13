@@ -1,69 +1,81 @@
-<<<<<<< HEAD
-# Project
+# Raffle System Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
-=======
-# RaffleSystem
+## Description
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
->>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
+A modern, responsive Single Page Application (SPA) built with Angular for managing and participating in Chinese Auctions. The frontend provides a polished user experience for browsing auctions, managing gifts, placing orders, and handling admin workflows.
 
-## Development server
+## Core Tech Stack
 
-To start a local development server, run:
+- Angular 18+ (project is currently based on Angular 21)
+- TypeScript
+- RxJS
+- SCSS
 
-```bash
-ng serve
-```
+## Professional Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Lazy Loading**: Route-based code splitting for major features including admin pages, cart, and order history.
+- **Global Interceptors**: Centralized HTTP handling for:
+  - Auth token injection
+  - loading states
+  - HTTP error handling
+- **State Management**: Reactive data flow using RxJS Observables.
+- **Security**: Route protection via `AuthGuard` and `AdminGuard`.
+- **User Interface**:
+  - Dark/light mode support
+  - Toast notification system for user feedback
 
-## Code scaffolding
+## Project Highlights
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Clean, component-based architecture
+- Standalone component usage for shared UI pieces like toast and loading overlay
+- Modular route configuration with lazy-loaded feature entry points
+- Global services for notifications, loading state, authentication, and error handling
 
-```bash
-ng generate component component-name
-```
+## Installation
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-<<<<<<< HEAD
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-=======
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
->>>>>>> ccdb27bc0fac5522c3dd81aa2fa017031ce9a21c
+1. Clone the repository:
 
 ```bash
-ng test
+git clone <repository-url>
+cd angolar
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+2. Install dependencies:
 
 ```bash
-ng e2e
+npm install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+3. Start the development server:
 
-## Additional Resources
+```bash
+npm start
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+4. Open the app in your browser:
+
+```text
+http://localhost:4200
+```
+
+## Available Scripts
+
+- `npm start` — runs `ng serve` and starts the local dev server
+- `npm run build` — builds the application for production
+- `npm test` — runs unit tests
+
+## Notes
+
+- The repository uses standalone components and the Angular `provideHttpClient`/`withInterceptors` integration.
+- Global loading and error handling are applied through HTTP interceptors.
+- Route-level guards enforce authentication and admin access.
+
+## Recommended Workflow
+
+- Use the existing component structure for fast feature development.
+- Keep shared behavior in services and interceptors to avoid duplication.
+- Favor lazy-loaded routes for large admin and user pages.
+
+---
+
+Built for a fast, secure, and maintainable raffle auction frontend experience.
