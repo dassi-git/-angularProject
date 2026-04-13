@@ -9,5 +9,6 @@ export * from './admin.guard'; // שומר נתיבי מנהל
 export * from './donor.service'; // שירות תורמים
 export * from './raffle.service'; // שירות הגרלות
 export * from './toast.service'; // שירות הודעות טוסט
+export * from './loading.service'; // שירות מצב טעינה גלובלי
 export * from './basket'; // שירות סל חלופי
 export * from './Admin'; // שירות אדמין

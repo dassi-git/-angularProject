@@ -1,36 +1,52 @@
 import { Routes } from '@angular/router';
-import { AdminDashboard } from './components/admin-dashboard/admin-dashboard';
-import { Login } from './components/login/login';
-import { Register } from './components/register/register';
-import { GiftList } from './gift-list/gift-list';
-import { GiftManagementComponent } from './components/gift-management/gift-management.component';
-import { MyOrdersComponent } from './components/my-orders/my-orders.component';
 import { AuthGuard } from './services';
 import { AdminGuard } from './services/admin.guard';
-import { DonorListComponent } from './components/donor/donor';
-import { RaffleManage } from './components/raffle-manage/raffle-manage';
-import { ReportDashboard } from './components/report-dashboard/report-dashboard';
-import { PurchasesReportComponent } from './components/purchases-report/purchases-report.component';
 import { Home } from './home/home';
+import { Login } from './components/login/login';
+import { Register } from './components/register/register';
 import { CatalogComponent } from './catalog/catalog';
-import { Cart } from './components/cart/cart';
 
 export const routes: Routes = [
   { path: '', component: Home, pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'catalog', component: CatalogComponent },
-  { path: 'cart', component: Cart, canActivate: [AuthGuard] },
-  { 
-    path: 'admin', 
-    component: AdminDashboard, 
+  {
+    path: 'cart',
+    loadComponent: () => import('./components/cart/cart').then(m => m.Cart),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'my-orders',
+    loadComponent: () => import('./components/my-orders/my-orders.component').then(m => m.MyOrdersComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./components/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard),
     canActivate: [AdminGuard],
+    canActivateChild: [AdminGuard],
     children: [
-      { path: 'donors', component: DonorListComponent },
-      { path: 'manage-gifts', component: GiftManagementComponent },
-      { path: 'raffles', component: RaffleManage },
-      { path: 'reports', component: ReportDashboard },
-      { path: 'purchases', component: PurchasesReportComponent }
+      {
+        path: 'donors',
+        loadComponent: () => import('./components/donor/donor').then(m => m.DonorListComponent)
+      },
+      {
+        path: 'manage-gifts',
+        loadComponent: () => import('./components/gift-management/gift-management.component').then(m => m.GiftManagementComponent)
+      },
+      {
+        path: 'raffles',
+        loadComponent: () => import('./components/raffle-manage/raffle-manage').then(m => m.RaffleManage)
+      },
+      {
+        path: 'reports',
+        loadComponent: () => import('./components/report-dashboard/report-dashboard').then(m => m.ReportDashboard)
+      },
+      {
+        path: 'purchases',
+        loadComponent: () => import('./components/purchases-report/purchases-report.component').then(m => m.PurchasesReportComponent)
+      }
     ]
   },
   { path: '**', redirectTo: '' }
